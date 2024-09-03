@@ -57,7 +57,7 @@
 
     <!-- Nav Item - Tables -->
     <li class="nav-item">
-        <a class="nav-link" href="<?= site_url('/dashboard/mata-kuliah') ?>">
+        <a class="nav-link" href="<?= site_url('/dashboard/dosen') ?>">
             <i class="fas fa-fw fa-users"></i>
             <span>Dosen</span></a>
     </li>

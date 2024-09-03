@@ -36,7 +36,21 @@ class MataKuliahController extends BaseController
 
         if (!$validation->withRequest($this->request)->run()) {
             $errors = $validation->getErrors();
-            $session->setFlashdata('message', 'Validation error: ' . implode(', ', $errors));
+
+            // Membuat error list dalam bentuk ul li
+            $errorList = '<ul>';
+            foreach ($errors as $error) {
+                $errorList .= '<li>' . esc($error) . '</li>';
+            }
+            $errorList .= '</ul>';
+
+            // Menyimpan pesan flash dengan title, data, dan type
+            $session->setFlashdata('message', [
+                'title' => 'Validation Error',
+                'data'  => $errorList,
+                'type'  => 'danger'
+            ]);
+
             return redirect()->to('/dashboard/mata-kuliah/create')->withInput();
         }
 
@@ -47,12 +61,25 @@ class MataKuliahController extends BaseController
         ];
 
         $this->model->save($data);
-        $session->setFlashdata('message', 'Data berhasil ditambahkan');
+
+        // Menyimpan pesan flash untuk sukses
+        $session->setFlashdata('message', [
+            'title' => 'Success',
+            'data'  => 'Data berhasil ditambahkan.',
+            'type'  => 'success'
+        ]);
+
         return redirect()->to('/dashboard/mata-kuliah');
     }
 
     public function edit($id)
     {
+        // Cek apakah ID ada dalam database
+        $existingData = $this->model->find($id);
+        if (!$existingData) {
+            // Redirect ke halaman 404 jika data tidak ditemukan
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Mata kuliah tidak ditemukan');
+        }
         $data['mata_kuliah'] = $this->model->find($id);
         return view('dashboard/mata-kuliah/edit', $data);
     }
@@ -61,13 +88,13 @@ class MataKuliahController extends BaseController
     {
         $session = session();
 
-       // Cek apakah ID ada dalam database
+        // Cek apakah ID ada dalam database
         $existingData = $this->model->find($id);
         if (!$existingData) {
             // Redirect ke halaman 404 jika data tidak ditemukan
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Mata kuliah tidak ditemukan');
         }
-        
+
         // Validasi input
         $validation = \Config\Services::validation();
         $validation->setRules([
@@ -88,15 +115,26 @@ class MataKuliahController extends BaseController
             ],
             'deskripsi'  => [
                 'rules' => 'permit_empty',
-                'errors' => [
-                    'permit_empty' => 'Deskripsi tidak wajib diisi.'
-                ],
             ]
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
             $errors = $validation->getErrors();
-            $session->setFlashdata('message', 'Validation error: ' . implode(', ', $errors));
+
+            // Membuat error list dalam bentuk ul li
+            $errorList = '<ul>';
+            foreach ($errors as $error) {
+                $errorList .= '<li>' . esc($error) . '</li>';
+            }
+            $errorList .= '</ul>';
+
+            // Menyimpan pesan flash dengan title, data, dan type
+            $session->setFlashdata('message', [
+                'title' => 'Validation Error',
+                'data'  => $errorList,
+                'type'  => 'danger'
+            ]);
+
             return redirect()->to('/dashboard/mata-kuliah/edit/' . $id)->withInput();
         }
 
@@ -107,17 +145,75 @@ class MataKuliahController extends BaseController
             'deskripsi'  => $this->request->getPost('deskripsi'),
         ];
 
-        // return var_dump($data);
-
         // Perbarui data
         $this->model->update($id, $data);
-        $session->setFlashdata('message', 'Data berhasil di edit');
+
+        // Menyimpan pesan flash untuk sukses
+        $session->setFlashdata('message', [
+            'title' => 'Success',
+            'data'  => 'Data berhasil di edit.',
+            'type'  => 'success'
+        ]);
+
         return redirect()->to('/dashboard/mata-kuliah');
     }
 
+    // public function delete($id)
+    // {
+    //     $this->model->delete($id);
+
+    //     // Menyimpan pesan flash untuk sukses
+    //     session()->setFlashdata('message', [
+    //         'title' => 'Success',
+    //         'data'  => 'Data berhasil dihapus.',
+    //         'type'  => 'success'
+    //     ]);
+
+    //     return redirect()->to('/dashboard/mata-kuliah');
+    // }
+
     public function delete($id)
     {
-        $this->model->delete($id);
-        return redirect()->to('/dashboard/mata-kuliah');
+        try {
+            // Cek apakah ID ada dalam database
+            $existingData = $this->model->find($id);
+            if (!$existingData) {
+                return $this->response->setJSON([
+                    'code' => 404,
+                    'message' => [
+                        'title' => 'Not Found',
+                        'description' => 'Mata kuliah tidak ditemukan',
+                        'type' => 'error'
+                    ],
+                    'data' => null
+                ]);
+            }
+
+            // Hapus data dari database
+            $this->model->delete($id);
+
+            // Mengembalikan respons sukses
+            return $this->response->setJSON([
+                'code' => 200,
+                'message' => [
+                    'title' => 'Success',
+                    'description' => 'Data berhasil dihapus.',
+                    'type' => 'success'
+                ],
+                'data' => null
+            ]);
+
+        } catch (\Exception $e) {
+            // Mengembalikan respons error jika terjadi exception
+            return $this->response->setJSON([
+                'code' => 500,
+                'message' => [
+                    'title' => 'Error',
+                    'description' => $e->getMessage(),
+                    'type' => 'error'
+                ],
+                'data' => null
+            ])->setStatusCode(500);
+        }
     }
 }

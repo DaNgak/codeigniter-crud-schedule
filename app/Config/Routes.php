@@ -20,3 +20,16 @@ $routes->group('dashboard/mata-kuliah', function($routes) {
     $routes->put('update/(:num)', 'MataKuliahController::update/$1'); // Menggunakan PUT untuk update
     $routes->delete('delete/(:num)', 'MataKuliahController::delete/$1'); // Menggunakan DELETE untuk delete
 });
+
+$routes->group('dashboard/dosen', function($routes) {
+    $routes->get('/', 'DosenController::index');
+    $routes->get('create', 'DosenController::create');
+    $routes->post('store', 'DosenController::store');
+    $routes->get('edit/(:num)', 'DosenController::edit/$1');
+    $routes->put('update/(:num)', 'DosenController::update/$1');
+    $routes->delete('delete/(:num)', 'DosenController::delete/$1');
+});
+
+
+
+

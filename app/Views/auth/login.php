@@ -18,7 +18,7 @@
             </div>
             <form class="user" action="<?= site_url('/loginPost') ?>" method="post">
                 <?php if(session()->getFlashdata('message')):?>
-                    <div class="alert alert-<?= session()->getFlashdata('message')['type'] ?> alert-dismissible fade show mb-4" role="alert" style="font-size: 0.875rem;">
+                    <div class="alert alert-<?= session()->getFlashdata('message')['type'] ?> alert-dismissible fade show mb-4" role="alert">
                         <strong><?= session()->getFlashdata('message')['title'] ?></strong><br/> <?= session()->getFlashdata('message')['data'] ?>
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>

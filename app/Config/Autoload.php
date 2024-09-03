@@ -91,6 +91,7 @@ class Autoload extends AutoloadConfig
      * @var list<string>
      */
     public $helpers = [
-        'setting'
+        'setting',
+        'sweetalert_helper'
     ];
 }
