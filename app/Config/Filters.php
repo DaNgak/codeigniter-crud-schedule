@@ -108,7 +108,7 @@ class Filters extends BaseFilters
             'auth' => [
                 'before' => [
                     'dashboard',
-                    'dashboard/mata_kuliah/*',  // Akses untuk semua rute di mata_kuliah
+                    'dashboard/*',
                 ]
             ],
         ],

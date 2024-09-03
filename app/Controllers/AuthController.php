@@ -9,33 +9,43 @@ class AuthController extends Controller
 {
     public function login()
     {
-        return view('auth/login');
+        $data['title'] = "Login";
+        return view('auth/login', $data);
     }
 
     public function loginPost()
     {
         $session = session();
         $model = new UserModel();
-    
+        
         // Validasi input
         $validation = \Config\Services::validation();
         $validation->setRules([
             'email'    => 'required|valid_email',
             'password' => 'required|min_length[8]'
         ]);
-    
+        
         if (!$validation->withRequest($this->request)->run()) {
             // Jika validasi gagal
             $errors = $validation->getErrors();
-            $session->setFlashdata('message', 'Validation error: ' . implode(', ', $errors));
-            return redirect()->to('/login');
+            $errorList = '<ul>';
+            foreach ($errors as $error) {
+                $errorList .= '<li>' . esc($error) . '</li>';
+            }
+            $errorList .= '</ul>';
+            $session->setFlashdata('message', [
+                'type'  => 'danger',
+                'title' => 'Error Validation',
+                'data'  => $errorList
+            ]);
+            return redirect()->to('/login')->withInput();
         }
         
         // Ambil data input
         $email = $this->request->getVar('email');
         $password = $this->request->getVar('password');
         $data = $model->where('email', $email)->first();
-
+    
         if ($data && password_verify($password, $data['password'])) {
             $ses_data = [
                 'id'        => $data['id'],
@@ -43,9 +53,18 @@ class AuthController extends Controller
                 'logged_in' => TRUE
             ];
             $session->set($ses_data);
+            $session->setFlashdata('message', [
+                'type'  => 'success',
+                'title' => 'Login Successful!',
+                'data'  => 'Welcome back, ' . $data['email']
+            ]);
             return redirect()->to('/dashboard');
         } else {
-            $session->setFlashdata('message', 'Kredential not found');
+            $session->setFlashdata('message', [
+                'type'  => 'danger',
+                'title' => 'Login Failed!',
+                'data'  => 'Kredential not found'
+            ]);
             return redirect()->to('/login');
         }
     }
