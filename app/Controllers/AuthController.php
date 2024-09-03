@@ -36,7 +36,7 @@ class AuthController extends Controller
             $session->setFlashdata('message', [
                 'type'  => 'danger',
                 'title' => 'Error Validation',
-                'data'  => $errorList
+                'description'  => $errorList
             ]);
             return redirect()->to('/login')->withInput();
         }
@@ -50,20 +50,20 @@ class AuthController extends Controller
             $ses_data = [
                 'id'        => $data['id'],
                 'email'     => $data['email'],
-                'logged_in' => TRUE
+                'isLoggedIn' => true
             ];
             $session->set($ses_data);
             $session->setFlashdata('message', [
                 'type'  => 'success',
                 'title' => 'Login Successful!',
-                'data'  => 'Welcome back, ' . $data['email']
+                'description'  => 'Welcome back, ' . $data['email']
             ]);
             return redirect()->to('/dashboard');
         } else {
             $session->setFlashdata('message', [
                 'type'  => 'danger',
                 'title' => 'Login Failed!',
-                'data'  => 'Kredential not found'
+                'description'  => 'Kredential not found'
             ]);
             return redirect()->to('/login');
         }

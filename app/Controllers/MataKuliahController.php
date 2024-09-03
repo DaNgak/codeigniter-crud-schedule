@@ -47,7 +47,7 @@ class MataKuliahController extends BaseController
             // Menyimpan pesan flash dengan title, data, dan type
             $session->setFlashdata('message', [
                 'title' => 'Validation Error',
-                'data'  => $errorList,
+                'description'  => $errorList,
                 'type'  => 'danger'
             ]);
 
@@ -65,7 +65,7 @@ class MataKuliahController extends BaseController
         // Menyimpan pesan flash untuk sukses
         $session->setFlashdata('message', [
             'title' => 'Success',
-            'data'  => 'Data berhasil ditambahkan.',
+            'description'  => 'Data berhasil ditambahkan.',
             'type'  => 'success'
         ]);
 
@@ -131,7 +131,7 @@ class MataKuliahController extends BaseController
             // Menyimpan pesan flash dengan title, data, dan type
             $session->setFlashdata('message', [
                 'title' => 'Validation Error',
-                'data'  => $errorList,
+                'description'  => $errorList,
                 'type'  => 'danger'
             ]);
 
@@ -151,7 +151,7 @@ class MataKuliahController extends BaseController
         // Menyimpan pesan flash untuk sukses
         $session->setFlashdata('message', [
             'title' => 'Success',
-            'data'  => 'Data berhasil di edit.',
+            'description'  => 'Data berhasil di edit.',
             'type'  => 'success'
         ]);
 
@@ -165,7 +165,7 @@ class MataKuliahController extends BaseController
     //     // Menyimpan pesan flash untuk sukses
     //     session()->setFlashdata('message', [
     //         'title' => 'Success',
-    //         'data'  => 'Data berhasil dihapus.',
+    //         'description'  => 'Data berhasil dihapus.',
     //         'type'  => 'success'
     //     ]);
 

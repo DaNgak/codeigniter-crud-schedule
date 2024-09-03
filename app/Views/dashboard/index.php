@@ -178,13 +178,11 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
-    <?php if(session()->getFlashdata('message')):?>
-        <script>
-            Swal.fire({
-                title: "<?= session()->getFlashdata('message')['title'] ?>",
-                text: "<?= session()->getFlashdata('message')['data'] ?>",
-                icon: "<?= session()->getFlashdata('message')['type'] ?>"
-            });
-        </script>
-    <?php endif;?>
+    <!-- Page level custom scripts -->
+    <script src="<?= base_url('vendor/chart.js/Chart.min.js') ?>"></script>
+    <script src="<?= base_url('js/demo/chart-area-demo.js') ?>"></script>
+    <script src="<?= base_url('js/demo/chart-pie-demo.js') ?>"></script>
+
+    <!-- Sweet Alert Session Flash Script -->
+    <?= showSweetAlert() ?>
 <?= $this->endSection() ?>

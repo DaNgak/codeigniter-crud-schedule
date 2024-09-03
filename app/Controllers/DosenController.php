@@ -43,7 +43,7 @@ class DosenController extends BaseController
 
             $session->setFlashdata('message', [
                 'title' => 'Validation Error',
-                'data' => $errorList,
+                'description' => $errorList,
                 'type' => 'danger'
             ]);
 
@@ -59,7 +59,7 @@ class DosenController extends BaseController
 
         $session->setFlashdata('message', [
             'title' => 'Success',
-            'data' => 'Data berhasil ditambahkan.',
+            'description' => 'Data berhasil ditambahkan.',
             'type' => 'success'
         ]);
 
@@ -102,7 +102,7 @@ class DosenController extends BaseController
 
             $session->setFlashdata('message', [
                 'title' => 'Validation Error',
-                'data' => $errorList,
+                'description' => $errorList,
                 'type' => 'danger'
             ]);
 
@@ -118,7 +118,7 @@ class DosenController extends BaseController
 
         $session->setFlashdata('message', [
             'title' => 'Success',
-            'data' => 'Data berhasil di edit.',
+            'description' => 'Data berhasil di edit.',
             'type' => 'success'
         ]);
 

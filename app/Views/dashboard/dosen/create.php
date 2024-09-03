@@ -13,14 +13,8 @@
                 <h6 class="m-0 font-weight-bold text-primary">Buat Dosen</h6>
             </div>
             <div class="card-body">
-                <?php if(session()->getFlashdata('message')):?>
-                    <div class="alert alert-<?= session()->getFlashdata('message')['type'] ?> alert-dismissible fade show mb-4" role="alert" style="font-size: 0.875rem;">
-                        <strong><?= session()->getFlashdata('message')['title'] ?></strong><br/> <?= session()->getFlashdata('message')['data'] ?>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                <?php endif;?>
+                <!-- Alert Bootstrap Session Flash Script -->
+                <?= showAlertBs(); ?>
 
                 <form action="<?= site_url('/dashboard/dosen/store') ?>" method="post">
                     <div class="form-group">

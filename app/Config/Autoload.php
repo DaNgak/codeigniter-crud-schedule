@@ -92,6 +92,6 @@ class Autoload extends AutoloadConfig
      */
     public $helpers = [
         'setting',
-        'sweetalert_helper'
+        'flash_alert_helper'
     ];
 }
