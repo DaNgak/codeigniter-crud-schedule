@@ -57,13 +57,6 @@
 
     <!-- Nav Item - Tables -->
     <li class="nav-item">
-        <a class="nav-link" href="<?= site_url('/dashboard/dosen') ?>">
-            <i class="fas fa-fw fa-users"></i>
-            <span>Dosen</span></a>
-    </li>
-
-    <!-- Nav Item - Tables -->
-    <li class="nav-item">
         <a class="nav-link" href="<?= site_url('/dashboard/program-studi') ?>">
             <i class="fas fa-fw fa-book"></i>
             <span>Program Studi</span></a>
@@ -74,6 +67,13 @@
         <a class="nav-link" href="<?= site_url('/dashboard/ruangan') ?>">
             <i class="fas fa-fw fa-table"></i>
             <span>Ruangan</span></a>
+    </li>
+
+    <!-- Nav Item - Tables -->
+        <li class="nav-item">
+        <a class="nav-link" href="<?= site_url('/dashboard/dosen') ?>">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Dosen</span></a>
     </li>
 
     <!-- Divider -->

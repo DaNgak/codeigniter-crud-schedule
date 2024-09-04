@@ -39,6 +39,16 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
         $routes->put('update/(:num)', 'DosenController::update/$1');
         $routes->delete('delete/(:num)', 'DosenController::delete/$1');
     });
+
+    // Route untuk 'ruangan'
+    $routes->group('ruangan', function($routes) {
+        $routes->get('/', 'RuanganController::index');
+        $routes->get('create', 'RuanganController::create');
+        $routes->post('store', 'RuanganController::store');
+        $routes->get('edit/(:num)', 'RuanganController::edit/$1');
+        $routes->put('update/(:num)', 'RuanganController::update/$1');
+        $routes->delete('delete/(:num)', 'RuanganController::delete/$1');
+    });
 });
 
 

@@ -16,7 +16,7 @@
                 <!-- Alert Bootstrap Session Flash Script -->
                 <?= showAlertBs(); ?>
 
-                <form action="<?= site_url('/dashboard/mata-kuliah/update/' . $mata_kuliah['id']) ?>" method="post">
+                <form action="<?= site_url('/dashboard/mata-kuliah/update/' . esc($mata_kuliah['id'])) ?>" method="post">
                     <input type="hidden" name="_method" value="PUT">
                     <div class="form-group">
                         <label for="nama">Nama:</label>

@@ -37,7 +37,7 @@
                                     <a href="<?= site_url('/dashboard/dosen/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm px-3">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button" class="btn btn-danger btn-sm px-3 btn-delete" data-url="<?= site_url('/dashboard/dosen/delete/' . $item['id']) ?>" data-id="<?= $item['id'] ?>">
+                                    <button type="button" class="btn btn-danger btn-sm px-3 btn-delete" data-url="<?= site_url('/dashboard/dosen/delete/' . $item['id']) ?>" data-id="<?= esc($item['id']) ?>">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>

@@ -1,25 +1,25 @@
 <?php namespace App\Controllers;
 
-use App\Models\MataKuliahModel;
+use App\Models\RuanganModel;
 
-class MataKuliahController extends BaseController
+class RuanganController extends BaseController
 {
     private $model;
 
     public function __construct()
     {
-        $this->model = new MataKuliahModel();
+        $this->model = new RuanganModel();
     }
 
     public function index()
     {
-        $data['mata_kuliah'] = $this->model->findAll();
-        return view('dashboard/mata-kuliah/index', $data);
+        $data['ruangan'] = $this->model->findAll();
+        return view('dashboard/ruangan/index', $data);
     }
 
     public function create()
     {
-        return view('dashboard/mata-kuliah/create');
+        return view('dashboard/ruangan/create');
     }
 
     public function store()
@@ -29,170 +29,181 @@ class MataKuliahController extends BaseController
         // Validasi input
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'nama'       => 'required|min_length[3]',
-            'kode'       => 'required|min_length[3]|is_unique[mata_kuliah.kode]',
-            'deskripsi'  => 'permit_empty'
+            'nama'       => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required'    => 'Nama ruangan harus diisi.',
+                    'min_length'  => 'Nama ruangan harus terdiri dari minimal {param} karakter.'
+                ],
+            ],
+            'kode'       => [
+                'rules' => 'required|min_length[3]|is_unique[ruangan.kode]',
+                'errors' => [
+                    'required'    => 'Kode ruangan harus diisi.',
+                    'min_length'  => 'Kode ruangan harus terdiri dari minimal {param} karakter.',
+                    'is_unique'   => 'Kode sudah digunakan, silakan gunakan kode lainnya.'
+                ],
+            ],
+            'keterangan' => [
+                'rules' => 'permit_empty|min_length[3]',
+                'errors' => [
+                    'min_length' => 'Keterangan harus terdiri dari minimal {param} karakter.'
+                ],
+            ],
+            'kapasitas'  => [
+                'rules' => 'required|integer|greater_than_equal_to[10]|less_than_equal_to[50]',
+                'errors' => [
+                    'required' => 'Kapasitas ruangan harus diisi.',
+                    'integer'  => 'Kapasitas ruangan harus berupa angka.',
+                    'greater_than_equal_to' => 'Kapasitas ruangan minimal 10.',
+                    'less_than_equal_to' => 'Kapasitas ruangan maksimal 50.'
+                ],
+            ],
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
             $errors = $validation->getErrors();
 
-            // Membuat error list dalam bentuk ul li
             $errorList = '<ul>';
             foreach ($errors as $error) {
                 $errorList .= '<li>' . esc($error) . '</li>';
             }
             $errorList .= '</ul>';
 
-            // Menyimpan pesan flash dengan title, data, dan type
             $session->setFlashdata('message', [
                 'title' => 'Validation Error',
                 'description'  => $errorList,
                 'type'  => 'danger'
             ]);
 
-            return redirect()->to('/dashboard/mata-kuliah/create')->withInput();
+            return redirect()->to('/dashboard/ruangan/create')->withInput();
         }
 
         $data = [
             'nama'       => $this->request->getPost('nama'),
             'kode'       => $this->request->getPost('kode'),
-            'deskripsi'  => $this->request->getPost('deskripsi'),
+            'keterangan' => $this->request->getPost('keterangan'),
+            'kapasitas'  => $this->request->getPost('kapasitas'),
         ];
 
         $this->model->save($data);
 
-        // Menyimpan pesan flash untuk sukses
         $session->setFlashdata('message', [
             'title' => 'Success',
             'description'  => 'Data berhasil ditambahkan.',
             'type'  => 'success'
         ]);
 
-        return redirect()->to('/dashboard/mata-kuliah');
+        return redirect()->to('/dashboard/ruangan');
     }
 
     public function edit($id)
     {
-        // Cek apakah ID ada dalam database
         $existingData = $this->model->find($id);
         if (!$existingData) {
-            // Redirect ke halaman 404 jika data tidak ditemukan
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Mata kuliah tidak ditemukan');
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Ruangan tidak ditemukan');
         }
-        $data['mata_kuliah'] = $this->model->find($id);
-        return view('dashboard/mata-kuliah/edit', $data);
+        $data['ruangan'] = $existingData;
+        return view('dashboard/ruangan/edit', $data);
     }
 
     public function update($id)
     {
         $session = session();
 
-        // Cek apakah ID ada dalam database
         $existingData = $this->model->find($id);
         if (!$existingData) {
-            // Redirect ke halaman 404 jika data tidak ditemukan
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Mata kuliah tidak ditemukan');
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Ruangan tidak ditemukan');
         }
 
-        // Validasi input
         $validation = \Config\Services::validation();
         $validation->setRules([
             'nama'       => [
                 'rules' => 'required|min_length[3]',
                 'errors' => [
-                    'required'    => 'Nama mata kuliah harus diisi.',
-                    'min_length'  => 'Nama mata kuliah harus terdiri dari minimal {param} karakter.'
+                    'required'    => 'Nama ruangan harus diisi.',
+                    'min_length'  => 'Nama ruangan harus terdiri dari minimal {param} karakter.'
                 ],
             ],
             'kode'       => [
-                'rules' => 'required|min_length[3]|is_unique[mata_kuliah.kode,id,' . $id . ']',
+                'rules' => 'required|min_length[3]|is_unique[ruangan.kode,id,' . $id . ']',
                 'errors' => [
-                    'required'    => 'Kode mata kuliah harus diisi.',
-                    'min_length'  => 'Kode mata kuliah harus terdiri dari minimal {param} karakter.',
-                    'is_unique'   => 'Kode sudah digunakan, silahkan gunakan kode lainnya.'
+                    'required'    => 'Kode ruangan harus diisi.',
+                    'min_length'  => 'Kode ruangan harus terdiri dari minimal {param} karakter.',
+                    'is_unique'   => 'Kode sudah digunakan, silakan gunakan kode lainnya.'
                 ],
             ],
-            'deskripsi'  => [
-                'rules' => 'permit_empty',
-            ]
+            'keterangan' => [
+                'rules' => 'permit_empty|min_length[3]',
+                'errors' => [
+                    'min_length' => 'Keterangan harus terdiri dari minimal {param} karakter.'
+                ],
+            ],
+            'kapasitas'  => [
+                'rules' => 'required|integer|greater_than_equal_to[10]|less_than_equal_to[50]',
+                'errors' => [
+                    'required' => 'Kapasitas ruangan harus diisi.',
+                    'integer'  => 'Kapasitas ruangan harus berupa angka.',
+                    'greater_than_equal_to' => 'Kapasitas ruangan minimal 10.',
+                    'less_than_equal_to' => 'Kapasitas ruangan maksimal 50.'
+                ],
+            ],
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
             $errors = $validation->getErrors();
 
-            // Membuat error list dalam bentuk ul li
             $errorList = '<ul>';
             foreach ($errors as $error) {
                 $errorList .= '<li>' . esc($error) . '</li>';
             }
             $errorList .= '</ul>';
 
-            // Menyimpan pesan flash dengan title, data, dan type
             $session->setFlashdata('message', [
                 'title' => 'Validation Error',
                 'description'  => $errorList,
                 'type'  => 'danger'
             ]);
 
-            return redirect()->to('/dashboard/mata-kuliah/edit/' . $id)->withInput();
+            return redirect()->to('/dashboard/ruangan/edit/' . $id)->withInput();
         }
 
-        // Ambil data input
         $data = [
             'nama'       => $this->request->getPost('nama'),
             'kode'       => $this->request->getPost('kode'),
-            'deskripsi'  => $this->request->getPost('deskripsi'),
+            'keterangan' => $this->request->getPost('keterangan'),
+            'kapasitas'  => $this->request->getPost('kapasitas'),
         ];
 
-        // Perbarui data
         $this->model->update($id, $data);
 
-        // Menyimpan pesan flash untuk sukses
         $session->setFlashdata('message', [
             'title' => 'Success',
             'description'  => 'Data berhasil di edit.',
             'type'  => 'success'
         ]);
 
-        return redirect()->to('/dashboard/mata-kuliah');
+        return redirect()->to('/dashboard/ruangan');
     }
-
-    // public function delete($id)
-    // {
-    //     $this->model->delete($id);
-
-    //     // Menyimpan pesan flash untuk sukses
-    //     session()->setFlashdata('message', [
-    //         'title' => 'Success',
-    //         'description'  => 'Data berhasil dihapus.',
-    //         'type'  => 'success'
-    //     ]);
-
-    //     return redirect()->to('/dashboard/mata-kuliah');
-    // }
 
     public function delete($id)
     {
         try {
-            // Cek apakah ID ada dalam database
             $existingData = $this->model->find($id);
             if (!$existingData) {
                 return $this->response->setJSON([
                     'code' => 404,
                     'message' => [
                         'title' => 'Not Found',
-                        'description' => 'Mata kuliah tidak ditemukan',
+                        'description' => 'Ruangan tidak ditemukan',
                         'type' => 'error'
                     ],
                     'data' => null
                 ])->setStatusCode(404);
             }
 
-            // Hapus data dari database
             $this->model->delete($id);
 
-            // Mengembalikan respons sukses
             return $this->response->setJSON([
                 'code' => 200,
                 'message' => [
@@ -204,7 +215,6 @@ class MataKuliahController extends BaseController
             ]);
 
         } catch (\Exception $e) {
-            // Mengembalikan respons error jika terjadi exception
             return $this->response->setJSON([
                 'code' => 500,
                 'message' => [

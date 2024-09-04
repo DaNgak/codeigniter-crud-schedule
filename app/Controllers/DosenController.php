@@ -28,25 +28,38 @@ class DosenController extends BaseController
 
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'nama' => 'required|min_length[3]',
-            'nomer_pegawai' => 'required|min_length[3]|is_unique[dosen.nomer_pegawai]',
+            'nama' => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'Nama wajib diisi.',
+                    'min_length' => 'Nama harus memiliki panjang minimal 3 karakter.'
+                ]
+            ],
+            'nomer_pegawai' => [
+                'rules' => 'required|exact_length[10]|is_unique[dosen.nomer_pegawai]',
+                'errors' => [
+                    'required' => 'Nomer Pegawai wajib diisi.',
+                    'exact_length' => 'Nomer Pegawai harus terdiri dari tepat 10 digit.',
+                    'is_unique' => 'Nomer Pegawai sudah terdaftar.'
+                ]
+            ],
         ]);
-
+    
         if (!$validation->withRequest($this->request)->run()) {
             $errors = $validation->getErrors();
-
+    
             $errorList = '<ul>';
             foreach ($errors as $error) {
                 $errorList .= '<li>' . esc($error) . '</li>';
             }
             $errorList .= '</ul>';
-
+    
             $session->setFlashdata('message', [
-                'title' => 'Validation Error',
+                'title' => 'Kesalahan Validasi',
                 'description' => $errorList,
                 'type' => 'danger'
             ]);
-
+    
             return redirect()->to('/dashboard/dosen/create')->withInput();
         }
 
@@ -72,7 +85,7 @@ class DosenController extends BaseController
         if (!$existingData) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Dosen tidak ditemukan');
         }
-        $data['dosen'] = $this->model->find($id);
+        $data['dosen'] = $existingData;
         return view('dashboard/dosen/edit', $data);
     }
 
@@ -87,8 +100,21 @@ class DosenController extends BaseController
 
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'nama' => 'required|min_length[3]',
-            'nomer_pegawai' => 'required|min_length[3]|is_unique[dosen.nomer_pegawai,id,' . $id . ']',
+            'nama' => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'Nama wajib diisi.',
+                    'min_length' => 'Nama harus memiliki panjang minimal 3 karakter.'
+                ]
+            ],
+            'nomer_pegawai' => [
+                'rules' => 'required|exact_length[10]|is_unique[dosen.nomer_pegawai,id,' . $id . ']',
+                'errors' => [
+                    'required' => 'Nomer Pegawai wajib diisi.',
+                    'exact_length' => 'Nomer Pegawai harus terdiri dari tepat 10 digit.',
+                    'is_unique' => 'Nomer Pegawai sudah terdaftar.'
+                ]
+            ],
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
@@ -138,7 +164,7 @@ class DosenController extends BaseController
                         'type' => 'error'
                     ],
                     'data' => null
-                ]);
+                ])->setStatusCode(404);
             }
 
             $this->model->delete($id);

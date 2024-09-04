@@ -1,22 +1,22 @@
 <?= $this->extend('layouts/app') ?>
 
 <?= $this->section('title') ?>
-    Mata Kuliah
+    Ruangan
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Mata Kuliah</h1>
-    <a href="<?= site_url('/dashboard/mata-kuliah/create') ?>" class="d-flex align-items-center btn btn-sm btn-primary shadow-sm"><span class="mr-2 m-0" style="font-size: 18px !important;">+</span> Tambah Data</a>
+    <h1 class="h3 mb-0 text-gray-800">Ruangan</h1>
+    <a href="<?= site_url('/dashboard/ruangan/create') ?>" class="d-flex align-items-center btn btn-sm btn-primary shadow-sm">
+        <span class="mr-2 m-0" style="font-size: 18px !important;">+</span> Tambah Data
+    </a>
 </div>
 
-<!-- Content Row -->
 <div class="row">
     <div class="col-lg-12">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Tabel Mata Kuliah</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Tabel Ruangan</h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -25,26 +25,34 @@
                             <tr>
                                 <th>Nama</th>
                                 <th>Kode</th>
-                                <th>Deskripsi</th>
+                                <th>Keterangan</th>
+                                <th>Kapasitas</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($mata_kuliah as $item): ?>
-                            <tr>
-                                <td><?= esc($item['nama']) ?></td>
-                                <td><?= esc($item['kode']) ?></td>
-                                <td><?= esc($item['deskripsi']) ?></td>
-                                <td>
-                                    <a href="<?= site_url('/dashboard/mata-kuliah/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm px-3">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-danger btn-sm px-3 btn-delete" data-url="<?= site_url('/dashboard/mata-kuliah/delete/' . $item['id']) ?>" data-id="<?= esc($item['id']) ?>">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
+                            <?php if(!empty($ruangan)): ?>
+                                <?php foreach($ruangan as $item): ?>
+                                    <tr>
+                                        <td><?= esc($item['nama']) ?></td>
+                                        <td><?= esc($item['kode']) ?></td>
+                                        <td><?= esc($item['keterangan']) ?></td>
+                                        <td><?= esc($item['kapasitas']) ?></td>
+                                        <td class="text-center">
+                                            <a href="<?= site_url('/dashboard/ruangan/edit/'.$item['id']) ?>" class="btn btn-warning btn-sm px-3">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-danger btn-sm px-3 btn-delete" data-url="<?= site_url('/dashboard/ruangan/delete/' . $item['id']) ?>" data-id="<?= esc($item['id']) ?>">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center">Data tidak ditemukan</td>
+                                </tr>
+                            <?php endif ?>
                         </tbody>
                     </table>
                 </div>
@@ -53,6 +61,7 @@
     </div>
 </div>
 <?= $this->endSection() ?>
+
 
 <?= $this->section('script') ?>
     <!-- Sweet Alert Session Flash Script -->
@@ -67,8 +76,7 @@
                 }
             });
 
-            $(document).on('click', '.btn-delete', function(e) {
-                e.preventDefault();
+            $(document).on('click', '.btn-delete', function() {
                 const deleteUrl = $(this).data('url');
                 const idData = $(this).data('id');
 
@@ -87,11 +95,11 @@
                             type: 'DELETE',
                             success: function(response) {
                                 if (response.code === 200) {
-                                    Swal.fire({
-                                        title: response.message.title,
-                                        text: response.message.description,
-                                        icon: response.message.type,
-                                    }).then(() => {
+                                    Swal.fire(
+                                        response.message.title,
+                                        response.message.description,
+                                        response.message.type
+                                    ).then(() => {
                                         // Reload DataTables instead of the entire page
                                         // $('#dataTable-id').DataTable().ajax.reload();
                                         location.reload();
@@ -114,7 +122,7 @@
                             }
                         });
                     }
-                });
+                })
             });
         });
     </script>
