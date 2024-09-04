@@ -19,7 +19,7 @@ class CreateProgramStudi extends Migration
             ],
             'kode' => [
                 'type'              => 'VARCHAR',
-                'constraint'        => '50',
+                'constraint'        => '10',
                 'unique'            => true,
             ],
             'created_at'  => [

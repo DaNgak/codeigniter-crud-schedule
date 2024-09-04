@@ -8,8 +8,9 @@ class DatabaseSeeder extends Seeder
     {
         // Menjalankan seeders
         $this->call('UserSeeder');
-        $this->call('MahasiswaSeeder');
-        $this->call('RuanganSeeder');
         $this->call('ProgramStudiSeeder');
+        $this->call('RuanganSeeder');
+        $this->call('KelasSeeder');
+        $this->call('MahasiswaSeeder');
     }
 }

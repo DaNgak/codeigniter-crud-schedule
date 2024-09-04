@@ -61,6 +61,16 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
         $routes->put('update/(:num)', 'ProgramStudiController::update/$1');
         $routes->delete('delete/(:num)', 'ProgramStudiController::delete/$1');
     });
+
+    // Route untuk 'kelas'
+    $routes->group('kelas', function($routes) {
+        $routes->get('/', 'KelasController::index');
+        $routes->get('create', 'KelasController::create');
+        $routes->post('store', 'KelasController::store');
+        $routes->get('edit/(:num)', 'KelasController::edit/$1');
+        $routes->put('update/(:num)', 'KelasController::update/$1');
+        $routes->delete('delete/(:num)', 'KelasController::delete/$1');
+    });
 });
 
 
