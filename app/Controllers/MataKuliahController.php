@@ -13,7 +13,7 @@ class MataKuliahController extends BaseController
 
     public function index()
     {
-        $data['mata_kuliah'] = $this->model->findAll();
+        $data['mataKuliah'] = $this->model->findAll();
         return view('dashboard/mata-kuliah/index', $data);
     }
 
@@ -29,9 +29,21 @@ class MataKuliahController extends BaseController
         // Validasi input
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'nama'       => 'required|min_length[3]',
-            'kode'       => 'required|min_length[3]|is_unique[mata_kuliah.kode]',
-            'deskripsi'  => 'permit_empty'
+            'nama'       => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required'    => 'Nama mata kuliah harus diisi.',
+                    'min_length'  => 'Nama mata kuliah harus terdiri dari minimal {param} karakter.'
+                ],
+            ],
+            'kode'       => [
+                'rules' => 'required|min_length[3]|is_unique[mata_kuliah.kode]',
+                'errors' => [
+                    'required'    => 'Kode mata kuliah harus diisi.',
+                    'min_length'  => 'Kode mata kuliah harus terdiri dari minimal {param} karakter.',
+                    'is_unique'   => 'Kode sudah digunakan, silahkan gunakan kode lainnya.'
+                ],
+            ]
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
@@ -80,7 +92,7 @@ class MataKuliahController extends BaseController
             // Redirect ke halaman 404 jika data tidak ditemukan
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Mata kuliah tidak ditemukan');
         }
-        $data['mata_kuliah'] = $this->model->find($id);
+        $data['mataKuliah'] = $this->model->find($id);
         return view('dashboard/mata-kuliah/edit', $data);
     }
 
@@ -112,9 +124,6 @@ class MataKuliahController extends BaseController
                     'min_length'  => 'Kode mata kuliah harus terdiri dari minimal {param} karakter.',
                     'is_unique'   => 'Kode sudah digunakan, silahkan gunakan kode lainnya.'
                 ],
-            ],
-            'deskripsi'  => [
-                'rules' => 'permit_empty',
             ]
         ]);
 

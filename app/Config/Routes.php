@@ -19,6 +19,8 @@ $routes->post('/logout', 'AuthController::logout', ['filter' => 'auth']);
 $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     // Route utama dashboard
     $routes->get('/', 'DashboardController::index');
+    
+    $routes->get('test', 'JadwalGenerateController::index');
 
     // Route untuk 'mata-kuliah'
     $routes->group('mata-kuliah', function($routes) {
@@ -48,6 +50,16 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
         $routes->get('edit/(:num)', 'RuanganController::edit/$1');
         $routes->put('update/(:num)', 'RuanganController::update/$1');
         $routes->delete('delete/(:num)', 'RuanganController::delete/$1');
+    });
+
+    // Route untuk 'program-studi'
+    $routes->group('program-studi', function($routes) {
+        $routes->get('/', 'ProgramStudiController::index');
+        $routes->get('create', 'ProgramStudiController::create');
+        $routes->post('store', 'ProgramStudiController::store');
+        $routes->get('edit/(:num)', 'ProgramStudiController::edit/$1');
+        $routes->put('update/(:num)', 'ProgramStudiController::update/$1');
+        $routes->delete('delete/(:num)', 'ProgramStudiController::delete/$1');
     });
 });
 

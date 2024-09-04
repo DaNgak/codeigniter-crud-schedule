@@ -1,0 +1,1 @@
+Kromosom [0]: ( <span class="text-danger">[MK1,R1,Senin,14:00 - 16:00]</span>,[MK2,R3,Senin,11:00 - 13:00],[MK3,R2,Senin,08:00 - 10:00],[MK4,R2,Senin,11:00 - 13:00],[MK5,R5,Senin,08:00 - 10:00],[MK6,R3,Senin,08:00 - 10:00],[MK7,R4,Senin,14:00 - 16:00],[MK8,R4,Senin,08:00 - 10:00],[MK9,R3,Senin,14:00 - 16:00],[MK10,R4,Senin,11:00 - 13:00])

@@ -1,12 +1,9 @@
 <?php
 
-// Inisialisasi: Membuat populasi awal dari individu (misalnya, string biner).
-// Evaluasi: Menghitung fitness dari setiap individu.
-// Seleksi: Memilih individu berdasarkan fitness mereka menggunakan roulette wheel.
-// Persilangan: Membuat individu baru dari pasangan orang tua.
-// Mutasi: Memodifikasi individu baru untuk menjaga keragaman.
-// Class definitions for Matkul, Ruang, and Waktu
- 
+namespace App\Controllers;
+
+use App\Controllers\BaseController;
+
 class Matkul {
     public $kode;
     public $nama;
@@ -38,54 +35,7 @@ class Waktu {
         $this->jam = $jam;
     }
 }
- 
-// Dummy Data
- 
-// Membuat data dummy Matkul
-$matkulList = [
-    new Matkul("MK1", "Matematika"),
-    new Matkul("MK2", "Fisika"),
-    new Matkul("MK3", "Kimia"),
-    new Matkul("MK4", "Biologi"),
-    new Matkul("MK5", "Sejarah"),
-    new Matkul("MK6", "Geografi"),
-    new Matkul("MK7", "Bahasa Indonesia"),
-    new Matkul("MK8", "Bahasa Inggris"),
-    new Matkul("MK9", "Seni"),
-    new Matkul("MK10", "Pendidikan Jasmani")
-];
- 
-// Membuat data dummy Ruang
-$ruangList = [
-    new Ruang("R1", "Ruang 1"),
-    new Ruang("R2", "Ruang 2"),
-    new Ruang("R3", "Ruang 3"),
-    new Ruang("R4", "Ruang 4"),
-    new Ruang("R5", "Ruang 5")
-];
- 
-// Membuat data dummy Waktu
-$waktuList = [
-    new Waktu("Senin", "08:00 - 10:00"),
-    new Waktu("Senin", "11:00 - 13:00"),
-    new Waktu("Senin", "14:00 - 16:00"),
-    // new Waktu("Selasa", "08:00 - 10:00"),
-    // new Waktu("Selasa", "11:00 - 13:00"),
-    // new Waktu("Selasa", "14:00 - 16:00"),
-    // new Waktu("Rabu", "08:00 - 10:00"),
-    // new Waktu("Rabu", "11:00 - 13:00"),
-    // new Waktu("Rabu", "14:00 - 16:00"),
-    // new Waktu("Kamis", "08:00 - 10:00"),
-    // new Waktu("Kamis", "11:00 - 13:00"),
-    // new Waktu("Kamis", "14:00 - 16:00"),
-    // new Waktu("Jumat", "08:00 - 10:00"),
-    // new Waktu("Jumat", "11:00 - 13:00"),
-    // new Waktu("Jumat", "14:00 - 16:00")
-];
- 
- 
-// Class AlgoritmaGenetika
- 
+
 class AlgoritmaGenetika {
     public $time_start, $time_end, $max_generation, $best_fitness;
     public $success = false;
@@ -138,14 +88,14 @@ class AlgoritmaGenetika {
         $seconds = round($this->time_end - $this->time_start, 2);
         echo "<pre style='color:black; font-size:0.8rem'>\r\nFITNESS TERBAIK       : " . $this->best_fitness;
         echo "\r\nGENERASI              : " . $this->generation;
-        echo "\r\nEXECUTION TIME        : " . $seconds . " detik";
+        echo "\r\nEXECUTION TIME        : " . gmdate("H:i:s", $seconds);
         echo "\r\nMEMORY USAGE          : " . round(memory_get_usage() / 1024 / 1024);
         echo "\r\nCROMOSSOM TERBAIK     : " . $this->print_cros($this->crommosom[$this->best_crommosom]);
-        echo "\n<div class='notic'><strong>";
+        echo "\n<div class='notic'><marquee>";
         if (count($this->crommosom[$this->best_crommosom]) > 0) {
             echo "\r\nPesan         : <span style='font-family-sans'>Kromosom terbaik berhasil ditemukan!</span>";             
         }
-        echo "</strong></div>";
+        echo "</marquee></div>";
         $this->get_debug();
     }
  
@@ -233,11 +183,11 @@ class AlgoritmaGenetika {
     }
  
     function show_fitness(){
-        $this->console .= "<pre style='color:black; font-size:0.8rem'>";
+        echo "<pre style='color:black; font-size:0.8rem'>";
         foreach ($this->fitness as $key => $fit) {
-            $this->console .=  "Fitnes dari kromosom [$key]: " . $fit['fitness'] . "<br/>";
+            echo "Fitnes dari kromosom [$key]: " . $fit['fitness'] . "<br/>";
         }
-        $this->console .=  "</pre><br/><hr/>";
+        echo "</pre>";
     }
  
     function get_com_pro(){
@@ -259,6 +209,7 @@ class AlgoritmaGenetika {
         $selected = [];
         for ($i = 0; $i < count($this->crommosom); $i++) {
             $rand = $this->get_rand(count($this->crommosom) - 1);
+            var_dump($rand);
             $selected[] = $this->choose_selection($rand);
         }
         $this->crommosom = $selected;
@@ -333,7 +284,7 @@ class AlgoritmaGenetika {
                 $arr[] = '[' . implode(',', $v) . ']';
             }
         }
-        return "Kromosom [$key]: ( " . implode(",", $arr) . ")";
+        return "Individu[$key]: ( " . implode(",", $arr) . ")";
     }
  
  
@@ -343,7 +294,57 @@ class AlgoritmaGenetika {
     }
 }
  
-// Example usage
-$algo = new AlgoritmaGenetika($matkulList, $ruangList, $waktuList);
-$algo->max_generation = 100;
-$algo->generate();
+
+class JadwalGenerateController extends BaseController
+{
+    public function index()
+    {
+    // Dummy Data
+
+    // Membuat data dummy Matkul
+    $matkulList = [
+        new Matkul("MK1", "Matematika"),
+        new Matkul("MK2", "Fisika"),
+        new Matkul("MK3", "Kimia"),
+        new Matkul("MK4", "Biologi"),
+        new Matkul("MK5", "Sejarah"),
+        new Matkul("MK6", "Geografi"),
+        new Matkul("MK7", "Bahasa Indonesia"),
+        new Matkul("MK8", "Bahasa Inggris"),
+        new Matkul("MK9", "Seni"),
+        new Matkul("MK10", "Pendidikan Jasmani")
+    ];
+    
+    // Membuat data dummy Ruang
+    $ruangList = [
+        new Ruang("R1", "Ruang 1"),
+        new Ruang("R2", "Ruang 2"),
+        new Ruang("R3", "Ruang 3"),
+        new Ruang("R4", "Ruang 4"),
+        new Ruang("R5", "Ruang 5")
+    ];
+    
+    // Membuat data dummy Waktu
+    $waktuList = [
+        new Waktu("Senin", "08:00 - 10:00"),
+        new Waktu("Senin", "11:00 - 13:00"),
+        new Waktu("Senin", "14:00 - 16:00"),
+        // new Waktu("Selasa", "08:00 - 10:00"),
+        // new Waktu("Selasa", "11:00 - 13:00"),
+        // new Waktu("Selasa", "14:00 - 16:00"),
+        // new Waktu("Rabu", "08:00 - 10:00"),
+        // new Waktu("Rabu", "11:00 - 13:00"),
+        // new Waktu("Rabu", "14:00 - 16:00"),
+        // new Waktu("Kamis", "08:00 - 10:00"),
+        // new Waktu("Kamis", "11:00 - 13:00"),
+        // new Waktu("Kamis", "14:00 - 16:00"),
+        // new Waktu("Jumat", "08:00 - 10:00"),
+        // new Waktu("Jumat", "11:00 - 13:00"),
+        // new Waktu("Jumat", "14:00 - 16:00")
+    ];
+
+        $algo = new AlgoritmaGenetika($matkulList, $ruangList, $waktuList);
+        $algo->max_generation = 100;
+        $algo->generate();
+    }
+}
