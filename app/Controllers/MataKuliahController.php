@@ -48,7 +48,8 @@ class MataKuliahController extends BaseController
                 ],
             ],
             'program_studi_id' => [
-                'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                // 'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                'rules' => 'required',  // Menggunakan nama validasi kustom
                 'errors' => [
                     'required' => 'Program studi harus dipilih.',
                     'check_exists' => 'Program studi yang dipilih tidak valid.',
@@ -102,7 +103,8 @@ class MataKuliahController extends BaseController
             // Redirect ke halaman 404 jika data tidak ditemukan
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Mata kuliah tidak ditemukan');
         }
-        $data['mataKuliah'] = $this->model->find($id);
+        $data['mataKuliah'] = $existingData;
+        $data['programStudi'] = $this->programStudiModel->findAll();
         return view('dashboard/mata-kuliah/edit', $data);
     }
 
@@ -134,7 +136,15 @@ class MataKuliahController extends BaseController
                     'min_length'  => 'Kode mata kuliah harus terdiri dari minimal {param} karakter.',
                     'is_unique'   => 'Kode sudah digunakan, silahkan gunakan kode lainnya.'
                 ],
-            ]
+            ],
+            'program_studi_id' => [
+                // 'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                'rules' => 'required',  // Menggunakan nama validasi kustom
+                'errors' => [
+                    'required' => 'Program studi harus dipilih.',
+                    'check_exists' => 'Program studi yang dipilih tidak valid.',
+                ],
+            ],
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
@@ -161,7 +171,7 @@ class MataKuliahController extends BaseController
         $data = [
             'nama'       => $this->request->getPost('nama'),
             'kode'       => $this->request->getPost('kode'),
-            'deskripsi'  => $this->request->getPost('deskripsi'),
+            'program_studi_id'  => $this->request->getPost('program_studi_id'),
         ];
 
         // Perbarui data

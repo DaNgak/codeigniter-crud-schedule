@@ -26,7 +26,18 @@
                         <label for="kode">Kode:</label>
                         <input type="text" name="kode" id="kode" class="form-control" value="<?= old('kode', esc($mataKuliah['kode'])) ?>">
                     </div>
-                    <div class="d-flex" style="gap: 1rem;">
+                    <div class="form-group">
+                        <label for="program_studi_id">Program Studi:</label>
+                        <select name="program_studi_id" id="program_studi_id" class="form-control">
+                            <option value="">--- Pilih Program Studi ---</option>
+                            <?php foreach ($programStudi as $prodi): ?>
+                                <option value="<?= $prodi['id'] ?>" <?= $prodi['id'] == old('program_studi_id', $mataKuliah['program_studi_id']) ? 'selected' : '' ?>>
+                                    <?= esc($prodi['nama']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="d-flex mt-4" style="gap: 1rem;">
                         <a href="<?= site_url('/dashboard/mata-kuliah') ?>" class="btn btn-secondary">Kembali</a>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </div>

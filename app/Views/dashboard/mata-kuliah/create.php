@@ -28,7 +28,7 @@
                     <div class="form-group">
                         <label for="program_studi_id">Program Studi:</label>
                         <select name="program_studi_id" id="program_studi_id" class="form-control">
-                            <option value="">-- Pilih Program Studi --</option>
+                            <option value="">--- Pilih Program Studi ---</option>
                             <?php foreach ($programStudi as $ps): ?>
                                 <option value="<?= esc($ps['id']) ?>" <?= old('program_studi_id') == $ps['id'] ? 'selected' : '' ?>>
                                     <?= esc($ps['nama']) ?>
