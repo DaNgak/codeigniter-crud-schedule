@@ -25,6 +25,7 @@
                             <tr>
                                 <th>Nama</th>
                                 <th>Kode</th>
+                                <th>Program Studi</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -33,6 +34,7 @@
                             <tr>
                                 <td><?= esc($item['nama']) ?></td>
                                 <td><?= esc($item['kode']) ?></td>
+                                <td><?= esc($item['program_studi']['nama']) ?></td>
                                 <td>
                                     <a href="<?= site_url('/dashboard/mata-kuliah/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm px-3">
                                         <i class="fas fa-edit"></i>

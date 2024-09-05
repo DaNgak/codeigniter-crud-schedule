@@ -59,6 +59,14 @@
         </a>
     </li>
 
+    <!-- Nav Item - Kelas -->
+    <li class="nav-item <?= (uri_string() == 'dashboard/kelas' || strpos(uri_string(), 'dashboard/kelas') === 0) ? 'active' : '' ?>">
+        <a class="nav-link" href="<?= site_url('/dashboard/kelas') ?>">
+            <i class="fab fa-fw fa-odnoklassniki"></i>
+            <span>Kelas</span>
+        </a>
+    </li>
+
     <!-- Divider -->
     <hr class="sidebar-divider">
 

@@ -14,5 +14,6 @@ class DatabaseSeeder extends Seeder
         $this->call('MahasiswaSeeder');
         $this->call('DosenSeeder');
         $this->call('RuanganSeeder');
+        $this->call('WaktuKuliahSeeder');
     }
 }

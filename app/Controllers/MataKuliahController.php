@@ -1,25 +1,28 @@
 <?php namespace App\Controllers;
 
 use App\Models\MataKuliahModel;
+use App\Models\ProgramStudiModel;
 
 class MataKuliahController extends BaseController
 {
-    private $model;
+    private $model, $programStudiModel;
 
     public function __construct()
     {
         $this->model = new MataKuliahModel();
+        $this->programStudiModel = new ProgramStudiModel();
     }
 
     public function index()
     {
-        $data['mataKuliah'] = $this->model->findAll();
+        $data['mataKuliah'] = $this->model->findAllWithProgramStudi();
         return view('dashboard/mata-kuliah/index', $data);
     }
 
     public function create()
     {
-        return view('dashboard/mata-kuliah/create');
+        $data['programStudi'] = $this->programStudiModel->findAll();
+        return view('dashboard/mata-kuliah/create', $data);
     }
 
     public function store()
@@ -43,7 +46,14 @@ class MataKuliahController extends BaseController
                     'min_length'  => 'Kode mata kuliah harus terdiri dari minimal {param} karakter.',
                     'is_unique'   => 'Kode sudah digunakan, silahkan gunakan kode lainnya.'
                 ],
-            ]
+            ],
+            'program_studi_id' => [
+                'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                'errors' => [
+                    'required' => 'Program studi harus dipilih.',
+                    'check_exists' => 'Program studi yang dipilih tidak valid.',
+                ],
+            ],
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
@@ -69,7 +79,7 @@ class MataKuliahController extends BaseController
         $data = [
             'nama'       => $this->request->getPost('nama'),
             'kode'       => $this->request->getPost('kode'),
-            'deskripsi'  => $this->request->getPost('deskripsi'),
+            'program_studi_id'  => $this->request->getPost('program_studi_id'),
         ];
 
         $this->model->save($data);
