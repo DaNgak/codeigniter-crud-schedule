@@ -30,6 +30,11 @@ class CreateRuangan extends Migration
                 'type'              => 'INT',
                 'constraint'        => 5,
             ],
+            'program_studi_id' => [
+                'type'       => 'INT',
+                'unsigned'   => true,
+                'null'       => true, // Set null jika program studi dihapus
+            ],
             'created_at'  => [
                 'type'       => 'DATETIME',
                 'null'       => true,
@@ -39,7 +44,14 @@ class CreateRuangan extends Migration
                 'null'       => true,
             ],
         ]);
+
+        // Menambahkan primary key
         $this->forge->addKey('id', true);
+
+        // Menambahkan foreign key untuk program_studi_id
+        $this->forge->addForeignKey('program_studi_id', 'program_studi', 'id', 'SET NULL', 'SET NULL');
+
+        // Membuat tabel
         $this->forge->createTable('ruangan');
     }
 

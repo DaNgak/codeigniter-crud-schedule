@@ -21,12 +21,13 @@ class CreateMataKuliahTable extends Migration
             ],
             'kode'        => [
                 'type'       => 'VARCHAR',
-                'constraint' => '20',
+                'constraint' => '10',
                 'unique'     => true, // Unik
             ],
-            'deskripsi'   => [
-                'type'       => 'TEXT',
-                'null'       => true, // Nullable
+            'program_studi_id' => [
+                'type'       => 'INT',
+                'unsigned'   => true,
+                'null'       => true, // Kolom program_studi_id bisa NULL
             ],
             'created_at'  => [
                 'type'       => 'DATETIME',
@@ -38,7 +39,14 @@ class CreateMataKuliahTable extends Migration
             ],
 
         ]);
+        
+        // Menambahkan primary key
         $this->forge->addKey('id', true);
+
+        // Menambahkan foreign key untuk program_studi_id dengan ON DELETE SET NULL
+        $this->forge->addForeignKey('program_studi_id', 'program_studi', 'id', 'SET NULL', 'SET NULL');
+
+        // Membuat tabel
         $this->forge->createTable('mata_kuliah');
     }
 

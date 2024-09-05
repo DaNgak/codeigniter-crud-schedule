@@ -104,9 +104,9 @@ $waktuList = [
 $kelasList = [
     new Ruang("TI-A", "Kelas TI A"),
     new Ruang("TI-B", "Kelas TI B"),
-    // new Ruang("TI-C", "Kelas TI C"),
-    // // new Ruang("TI-D", "Kelas TI D"),
-    // // new Ruang("TI-E", "Kelas TI E")
+    new Ruang("TI-C", "Kelas TI C"),
+    // new Ruang("TI-D", "Kelas TI D"),
+    // new Ruang("TI-E", "Kelas TI E")
 ];
 
 // Membuat data dummy Dosen
@@ -126,17 +126,38 @@ $dosenList = [
 /// Inisialisasi individu
 function create_individual($kelasList, $matkulList, $ruangList, $waktuList, $dosenList) {
     $individu = [];
+    $schedules = []; // Untuk melacak jadwal yang sudah ada
 
     // Loop melalui setiap kelas dan atur mata kuliah mereka
     foreach ($kelasList as $kelas) {
         foreach ($matkulList as $matkul) {
-            $individu[] = [
-                'kelas' => $kelas,
-                'matkul' => $matkul,
-                'ruang' => $ruangList[array_rand($ruangList)],
-                'waktu' => $waktuList[array_rand($waktuList)],
-                'dosen' => $dosenList[array_rand($dosenList)],
-            ];
+            $is_unique = false;
+
+            while (!$is_unique) {
+                $new_schedule = [
+                    'kelas' => $kelas,
+                    'matkul' => $matkul,
+                    'ruang' => $ruangList[array_rand($ruangList)],
+                    'waktu' => $waktuList[array_rand($waktuList)],
+                    'dosen' => $dosenList[array_rand($dosenList)],
+                ];
+
+                $is_unique = true;
+                foreach ($schedules as $schedule) {
+                    if ($new_schedule['kelas']->kode === $schedule['kelas']->kode &&
+                        $new_schedule['matkul']->kode === $schedule['matkul']->kode &&
+                        $new_schedule['ruang']->kode === $schedule['ruang']->kode &&
+                        $new_schedule['waktu']->hari === $schedule['waktu']->hari &&
+                        $new_schedule['waktu']->jam === $schedule['waktu']->jam &&
+                        $new_schedule['dosen']->nama === $schedule['dosen']->nama) {
+                        $is_unique = false;
+                        break;
+                    }
+                }
+            }
+
+            $individu[] = $new_schedule;
+            $schedules[] = $new_schedule; // Tambahkan jadwal yang valid
         }
     }
 
@@ -156,7 +177,7 @@ function create_population($size, $kelasList, $matkulList, $ruangList, $waktuLis
 function calculate_fitness($individual) {
     $conflicts = 0;
     $count = count($individual);
-
+    $schedules = [];
     // Cek benturan waktu dan ruang antar jadwal
     for ($i = 0; $i < $count; $i++) {
         for ($j = $i + 1; $j < $count; $j++) {
@@ -168,6 +189,13 @@ function calculate_fitness($individual) {
                     $conflicts++;
                 }
             }
+        }
+        // Memeriksa keunikan jadwal dalam individu
+        $schedule_key = "{$individual[$i]['kelas']->kode}-{$individual[$i]['matkul']->kode}-{$individual[$i]['ruang']->kode}-{$individual[$i]['waktu']->hari}-{$individual[$i]['waktu']->jam}-{$individual[$i]['dosen']->nama}";
+        if (in_array($schedule_key, $schedules)) {
+            $conflicts++;
+        } else {
+            $schedules[] = $schedule_key;
         }
     }
 
@@ -203,10 +231,31 @@ function crossover($parent1, $parent2) {
 // Mutasi
 function mutate($individual, $ruangList, $waktuList, $dosenList) {
     $mutation_point = rand(0, count($individual) - 1);
-    $individual[$mutation_point]['ruang'] = $ruangList[array_rand($ruangList)];
-    $individual[$mutation_point]['waktu'] = $waktuList[array_rand($waktuList)];
-    $individual[$mutation_point]['dosen'] = $dosenList[array_rand($dosenList)];
+    $new_schedule = $individual[$mutation_point];
 
+    // Pilih jadwal baru yang unik
+    $is_unique = false;
+    while (!$is_unique) {
+        $new_schedule['ruang'] = $ruangList[array_rand($ruangList)];
+        $new_schedule['waktu'] = $waktuList[array_rand($waktuList)];
+        $new_schedule['dosen'] = $dosenList[array_rand($dosenList)];
+
+        $is_unique = true;
+        foreach ($individual as $schedule) {
+            if ($schedule !== $new_schedule &&
+                $new_schedule['kelas']->kode === $schedule['kelas']->kode &&
+                $new_schedule['matkul']->kode === $schedule['matkul']->kode &&
+                $new_schedule['ruang']->kode === $schedule['ruang']->kode &&
+                $new_schedule['waktu']->hari === $schedule['waktu']->hari &&
+                $new_schedule['waktu']->jam === $schedule['waktu']->jam &&
+                $new_schedule['dosen']->nama === $schedule['dosen']->nama) {
+                $is_unique = false;
+                break;
+            }
+        }
+    }
+
+    $individual[$mutation_point] = $new_schedule;
     return $individual;
 }
 

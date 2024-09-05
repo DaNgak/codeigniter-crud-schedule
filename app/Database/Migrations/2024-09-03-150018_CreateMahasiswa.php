@@ -19,8 +19,18 @@ class CreateMahasiswa extends Migration
             ],
             'nomer_identitas' => [
                 'type'              => 'VARCHAR',
-                'constraint'        => '50',
+                'constraint'        => '10',
                 'unique'            => true,
+            ],
+            'program_studi_id' => [
+                'type'       => 'INT',
+                'unsigned'   => true,
+                'null'       => true, // Nullable jika program studi dihapus
+            ],
+            'kelas_id' => [
+                'type'       => 'INT',
+                'unsigned'   => true,
+                'null'       => true, // Nullable jika kelas dihapus
             ],
             'created_at'  => [
                 'type'       => 'DATETIME',
@@ -31,7 +41,17 @@ class CreateMahasiswa extends Migration
                 'null'       => true,
             ],
         ]);
+
+        // Menambahkan primary key
         $this->forge->addKey('id', true);
+
+        // Menambahkan foreign key untuk program_studi_id
+        $this->forge->addForeignKey('program_studi_id', 'program_studi', 'id', 'SET NULL', 'SET NULL');
+
+        // Menambahkan foreign key untuk kelas_id
+        $this->forge->addForeignKey('kelas_id', 'kelas', 'id', 'SET NULL', 'SET NULL');
+
+        // Membuat tabel
         $this->forge->createTable('mahasiswa');
     }
 

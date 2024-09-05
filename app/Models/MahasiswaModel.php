@@ -7,7 +7,7 @@ class MahasiswaModel extends Model
     protected $table = 'mahasiswa';
     protected $primaryKey = 'id';
 
-    protected $allowedFields = ['nama', 'nomer_identitas'];
+    protected $allowedFields = ['nama', 'nomer_identitas', 'program_studi_id', 'kelas_id'];
 
     protected $useTimestamps = true;
 }

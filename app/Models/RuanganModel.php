@@ -7,7 +7,7 @@ class RuanganModel extends Model
     protected $table = 'ruangan';
     protected $primaryKey = 'id';
 
-    protected $allowedFields = ['nama', 'kode', 'keterangan', 'kapasitas'];
+    protected $allowedFields = ['nama', 'kode', 'keterangan', 'kapasitas', 'program_studi_id'];
 
     protected $useTimestamps = true;
 }
