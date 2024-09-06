@@ -71,6 +71,26 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
         $routes->put('update/(:num)', 'KelasController::update/$1');
         $routes->delete('delete/(:num)', 'KelasController::delete/$1');
     });
+
+    // Route untuk 'waktu-kuliah'
+    $routes->group('waktu-kuliah', function($routes) {
+        $routes->get('/', 'WaktuKuliahController::index');
+        $routes->get('create', 'WaktuKuliahController::create');
+        $routes->post('store', 'WaktuKuliahController::store');
+        $routes->get('edit/(:num)', 'WaktuKuliahController::edit/$1');
+        $routes->put('update/(:num)', 'WaktuKuliahController::update/$1');
+        $routes->delete('delete/(:num)', 'WaktuKuliahController::delete/$1');
+    });
+
+    // Route untuk 'jadwal'
+    $routes->group('jadwal', function($routes) {
+        $routes->get('/', 'JadwalController::index');
+        $routes->get('create', 'JadwalController::create');
+        $routes->post('store', 'JadwalController::store');
+        $routes->get('edit/(:num)', 'JadwalController::edit/$1');
+        $routes->put('update/(:num)', 'JadwalController::update/$1');
+        $routes->delete('delete/(:num)', 'JadwalController::delete/$1');
+    });
 });
 
 

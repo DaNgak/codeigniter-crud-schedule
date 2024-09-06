@@ -59,6 +59,14 @@
         </a>
     </li>
 
+    <!-- Nav Item - Mahasiswa -->
+    <li class="nav-item <?= (uri_string() == 'dashboard/mahasiswa' || strpos(uri_string(), 'dashboard/mahasiswa') === 0) ? 'active' : '' ?>">
+        <a class="nav-link" href="<?= site_url('/dashboard/mahasiswa') ?>">
+            <i class="fas fa-fw fa-ghost"></i>
+            <span>Mahasiswa</span>
+        </a>
+    </li>
+
     <!-- Nav Item - Kelas -->
     <li class="nav-item <?= (uri_string() == 'dashboard/kelas' || strpos(uri_string(), 'dashboard/kelas') === 0) ? 'active' : '' ?>">
         <a class="nav-link" href="<?= site_url('/dashboard/kelas') ?>">
@@ -70,6 +78,14 @@
     <!-- Divider -->
     <hr class="sidebar-divider">
 
+    <!-- Nav Item - Waktu Kuliah -->
+    <li class="nav-item <?= (uri_string() == 'dashboard/waktu-kuliah' || strpos(uri_string(), 'dashboard/waktu-kuliah') === 0) ? 'active' : '' ?>">
+        <a class="nav-link" href="<?= site_url('/dashboard/waktu-kuliah') ?>">
+            <i class="fas fa-fw fa-clock"></i>
+            <span>Waktu Kuliah</span>
+        </a>
+    </li>
+    
     <!-- Nav Item - Jadwal Dropdown -->
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"

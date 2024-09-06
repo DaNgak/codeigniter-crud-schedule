@@ -27,6 +27,7 @@
                                 <th>Kode</th>
                                 <th>Keterangan</th>
                                 <th>Kapasitas</th>
+                                <th>Program Studi</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -38,6 +39,7 @@
                                         <td><?= esc($item['kode']) ?></td>
                                         <td><?= esc($item['keterangan']) ?></td>
                                         <td><?= esc($item['kapasitas']) ?></td>
+                                        <td><?= esc($item['program_studi']['nama']) ?></td>
                                         <td class="text-center">
                                             <a href="<?= site_url('/dashboard/ruangan/edit/'.$item['id']) ?>" class="btn btn-warning btn-sm px-3">
                                                 <i class="fas fa-edit"></i>

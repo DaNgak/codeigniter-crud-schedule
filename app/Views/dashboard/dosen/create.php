@@ -25,7 +25,18 @@
                         <label for="nomer_pegawai">Nomer Pegawai:</label>
                         <input type="number" name="nomer_pegawai" id="nomer_pegawai" class="form-control" value="<?= old('nomer_pegawai') ?>" maxlength="10" minlength="10">
                     </div>
-                    <div class="d-flex" style="gap: 1rem;">
+                    <div class="form-group">
+                        <label for="program_studi_id">Program Studi:</label>
+                        <select name="program_studi_id" id="program_studi_id" class="form-control">
+                            <option value="">--- Pilih Program Studi ---</option>
+                            <?php foreach ($programStudi as $ps): ?>
+                                <option value="<?= esc($ps['id']) ?>" <?= old('program_studi_id') == $ps['id'] ? 'selected' : '' ?>>
+                                    <?= esc($ps['nama']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="d-flex mt-4" style="gap: 1rem;">
                         <a href="<?= site_url('/dashboard/dosen') ?>" class="btn btn-secondary">Kembali</a>
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>

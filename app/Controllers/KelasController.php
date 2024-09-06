@@ -16,7 +16,7 @@ class KelasController extends BaseController
 
     public function index()
     {
-        $data['kelas'] = $this->kelasModel->withProgramStudi();;
+        $data['kelas'] = $this->kelasModel->findAllWithProgramStudi();;
         return view('dashboard/kelas/index', $data);
     }
 
@@ -33,13 +33,6 @@ class KelasController extends BaseController
         // Validasi input
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'program_studi_id' => [
-                'rules' => 'required|is_not_unique[program_studi.id]',
-                'errors' => [
-                    'required'    => 'Program studi harus dipilih.',
-                    'is_not_unique' => 'Program studi tidak valid.'
-                ],
-            ],
             'nama'       => [
                 'rules' => 'required|min_length[3]',
                 'errors' => [
@@ -53,6 +46,14 @@ class KelasController extends BaseController
                     'required'    => 'Kode kelas harus diisi.',
                     'min_length'  => 'Kode kelas harus terdiri dari minimal {param} karakter.',
                     'is_unique'   => 'Kode sudah digunakan, silakan gunakan kode lainnya.'
+                ],
+            ],
+            'program_studi_id' => [
+                // 'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                'rules' => 'required',  // Menggunakan nama validasi kustom
+                'errors' => [
+                    'required' => 'Program studi harus dipilih.',
+                    'check_exists' => 'Program studi yang dipilih tidak valid.',
                 ],
             ],
         ]);
@@ -76,9 +77,9 @@ class KelasController extends BaseController
         }
 
         $data = [
-            'program_studi_id' => $this->request->getPost('program_studi_id'),
             'nama'             => $this->request->getPost('nama'),
             'kode'             => $this->request->getPost('kode'),
+            'program_studi_id' => $this->request->getPost('program_studi_id'),
         ];
 
         $this->kelasModel->save($data);
@@ -114,13 +115,6 @@ class KelasController extends BaseController
 
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'program_studi_id' => [
-                'rules' => 'required|is_not_unique[program_studi.id]',
-                'errors' => [
-                    'required'    => 'Program studi harus dipilih.',
-                    'is_not_unique' => 'Program studi tidak valid.'
-                ],
-            ],
             'nama'       => [
                 'rules' => 'required|min_length[3]',
                 'errors' => [
@@ -134,6 +128,14 @@ class KelasController extends BaseController
                     'required'    => 'Kode kelas harus diisi.',
                     'min_length'  => 'Kode kelas harus terdiri dari minimal {param} karakter.',
                     'is_unique'   => 'Kode sudah digunakan, silakan gunakan kode lainnya.'
+                ],
+            ],
+            'program_studi_id' => [
+                // 'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                'rules' => 'required',  // Menggunakan nama validasi kustom
+                'errors' => [
+                    'required' => 'Program studi harus dipilih.',
+                    'check_exists' => 'Program studi yang dipilih tidak valid.',
                 ],
             ],
         ]);
@@ -157,9 +159,9 @@ class KelasController extends BaseController
         }
 
         $data = [
-            'program_studi_id' => $this->request->getPost('program_studi_id'),
             'nama'             => $this->request->getPost('nama'),
             'kode'             => $this->request->getPost('kode'),
+            'program_studi_id' => $this->request->getPost('program_studi_id'),
         ];
 
         $this->kelasModel->update($id, $data);

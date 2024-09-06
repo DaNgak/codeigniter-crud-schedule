@@ -1,25 +1,28 @@
 <?php namespace App\Controllers;
 
+use App\Models\ProgramStudiModel;
 use App\Models\RuanganModel;
 
 class RuanganController extends BaseController
 {
-    private $model;
+    private $model, $programStudiModel;
 
     public function __construct()
     {
         $this->model = new RuanganModel();
+        $this->programStudiModel = new ProgramStudiModel();
     }
 
     public function index()
     {
-        $data['ruangan'] = $this->model->findAll();
+        $data['ruangan'] = $this->model->findAllWithProgramStudi();
         return view('dashboard/ruangan/index', $data);
     }
 
     public function create()
     {
-        return view('dashboard/ruangan/create');
+        $data['programStudi'] = $this->programStudiModel->findAll();
+        return view('dashboard/ruangan/create', $data);
     }
 
     public function store()
@@ -59,6 +62,14 @@ class RuanganController extends BaseController
                     'less_than_equal_to' => 'Kapasitas ruangan maksimal 50.'
                 ],
             ],
+            'program_studi_id' => [
+                // 'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                'rules' => 'required',  // Menggunakan nama validasi kustom
+                'errors' => [
+                    'required' => 'Program studi harus dipilih.',
+                    'check_exists' => 'Program studi yang dipilih tidak valid.',
+                ],
+            ],
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
@@ -84,6 +95,7 @@ class RuanganController extends BaseController
             'kode'       => $this->request->getPost('kode'),
             'keterangan' => $this->request->getPost('keterangan'),
             'kapasitas'  => $this->request->getPost('kapasitas'),
+            'program_studi_id'  => $this->request->getPost('program_studi_id'),
         ];
 
         $this->model->save($data);
@@ -104,6 +116,7 @@ class RuanganController extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Ruangan tidak ditemukan');
         }
         $data['ruangan'] = $existingData;
+        $data['programStudi'] = $this->programStudiModel->findAll();
         return view('dashboard/ruangan/edit', $data);
     }
 
@@ -148,6 +161,14 @@ class RuanganController extends BaseController
                     'less_than_equal_to' => 'Kapasitas ruangan maksimal 50.'
                 ],
             ],
+            'program_studi_id' => [
+                // 'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                'rules' => 'required',  // Menggunakan nama validasi kustom
+                'errors' => [
+                    'required' => 'Program studi harus dipilih.',
+                    'check_exists' => 'Program studi yang dipilih tidak valid.',
+                ],
+            ],
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
@@ -173,6 +194,7 @@ class RuanganController extends BaseController
             'kode'       => $this->request->getPost('kode'),
             'keterangan' => $this->request->getPost('keterangan'),
             'kapasitas'  => $this->request->getPost('kapasitas'),
+            'program_studi_id'  => $this->request->getPost('program_studi_id'),
         ];
 
         $this->model->update($id, $data);

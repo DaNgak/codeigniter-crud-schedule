@@ -23,7 +23,9 @@ class MataKuliahModel extends Model
 
         // Membentuk array bersarang
         foreach ($result as &$row) {
-            $row['program_studi'] = ['nama' => $row['program_studi_nama']];
+            $row['program_studi'] = [
+                'nama' => $row['program_studi_nama']
+            ];
             unset($row['program_studi_nama']);  // Hapus alias yang tidak diperlukan
         }
 

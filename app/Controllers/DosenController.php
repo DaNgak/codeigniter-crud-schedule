@@ -1,25 +1,29 @@
 <?php namespace App\Controllers;
 
 use App\Models\DosenModel;
+use App\Models\ProgramStudiModel;
 
 class DosenController extends BaseController
 {
-    private $model;
+    private $model, $programStudiModel;
 
     public function __construct()
     {
         $this->model = new DosenModel();
+        $this->programStudiModel = new ProgramStudiModel();
+
     }
 
     public function index()
     {
-        $data['dosen'] = $this->model->findAll();
+        $data['dosen'] = $this->model->findAllWithProgramStudi();
         return view('dashboard/dosen/index', $data);
     }
 
     public function create()
     {
-        return view('dashboard/dosen/create');
+        $data['programStudi'] = $this->programStudiModel->findAll();
+        return view('dashboard/dosen/create', $data);
     }
 
     public function store()
@@ -43,29 +47,38 @@ class DosenController extends BaseController
                     'is_unique' => 'Nomer Pegawai sudah terdaftar.'
                 ]
             ],
+            'program_studi_id' => [
+                // 'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                'rules' => 'required',  // Menggunakan nama validasi kustom
+                'errors' => [
+                    'required' => 'Program studi harus dipilih.',
+                    'check_exists' => 'Program studi yang dipilih tidak valid.',
+                ],
+            ],
         ]);
-    
+
         if (!$validation->withRequest($this->request)->run()) {
             $errors = $validation->getErrors();
-    
+
             $errorList = '<ul>';
             foreach ($errors as $error) {
                 $errorList .= '<li>' . esc($error) . '</li>';
             }
             $errorList .= '</ul>';
-    
+
             $session->setFlashdata('message', [
                 'title' => 'Kesalahan Validasi',
                 'description' => $errorList,
                 'type' => 'danger'
             ]);
-    
+
             return redirect()->to('/dashboard/dosen/create')->withInput();
         }
 
         $data = [
             'nama' => $this->request->getPost('nama'),
             'nomer_pegawai' => $this->request->getPost('nomer_pegawai'),
+            'program_studi_id' => $this->request->getPost('program_studi_id'),
         ];
 
         $this->model->save($data);
@@ -86,6 +99,7 @@ class DosenController extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Dosen tidak ditemukan');
         }
         $data['dosen'] = $existingData;
+        $data['programStudi'] = $this->programStudiModel->findAll();
         return view('dashboard/dosen/edit', $data);
     }
 
@@ -115,6 +129,14 @@ class DosenController extends BaseController
                     'is_unique' => 'Nomer Pegawai sudah terdaftar.'
                 ]
             ],
+            'program_studi_id' => [
+                // 'rules' => 'required|check_exists[program_studi,id]',  // Menggunakan nama validasi kustom
+                'rules' => 'required',  // Menggunakan nama validasi kustom
+                'errors' => [
+                    'required' => 'Program studi harus dipilih.',
+                    'check_exists' => 'Program studi yang dipilih tidak valid.',
+                ],
+            ],
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
@@ -138,6 +160,7 @@ class DosenController extends BaseController
         $data = [
             'nama' => $this->request->getPost('nama'),
             'nomer_pegawai' => $this->request->getPost('nomer_pegawai'),
+            'program_studi_id' => $this->request->getPost('program_studi_id'),
         ];
 
         $this->model->update($id, $data);

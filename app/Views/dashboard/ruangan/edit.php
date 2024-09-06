@@ -31,10 +31,21 @@
                         <input type="number" name="kapasitas" id="kapasitas" class="form-control" value="<?= old('kapasitas', esc($ruangan['kapasitas'])) ?>" min="10" max="50">
                     </div>
                     <div class="form-group">
+                        <label for="program_studi_id">Program Studi:</label>
+                        <select name="program_studi_id" id="program_studi_id" class="form-control">
+                            <option value="">--- Pilih Program Studi ---</option>
+                            <?php foreach ($programStudi as $prodi): ?>
+                                <option value="<?= $prodi['id'] ?>" <?= $prodi['id'] == old('program_studi_id', $ruangan['program_studi_id']) ? 'selected' : '' ?>>
+                                    <?= esc($prodi['nama']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="keterangan">Keterangan:</label>
                         <textarea name="keterangan" id="keterangan" class="form-control" rows="4"><?= old('keterangan', esc($ruangan['keterangan'])) ?></textarea>
                     </div>
-                    <div class="d-flex" style="gap: 1rem;">
+                    <div class="d-flex mt-4" style="gap: 1rem;">
                         <a href="<?= site_url('/dashboard/ruangan') ?>" class="btn btn-secondary">Kembali</a>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </div>

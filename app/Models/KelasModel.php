@@ -7,16 +7,26 @@ class KelasModel extends Model
     protected $table = 'kelas';
     protected $primaryKey = 'id';
 
-    protected $allowedFields = ['program_studi_id', 'nama', 'kode'];
+    protected $allowedFields = ['nama', 'kode', 'program_studi_id'];
 
     protected $useTimestamps = true;
 
-    // Method to get all kelas with related program studi
-    public function withProgramStudi()
+    // Method untuk join dengan program studi dan membentuk hasil array bersarang
+    public function findAllWithProgramStudi()
     {
-        $builder = $this->builder();
-        $builder->select('kelas.*, program_studi.nama as program_studi_nama');
-        $builder->join('program_studi', 'program_studi.id = kelas.program_studi_id');
-        return $builder->get()->getResultArray();
+        $result = $this->select('kelas.*, program_studi.nama as program_studi_nama')
+            ->join('program_studi', 'program_studi.id = kelas.program_studi_id', 'left')
+            ->get()
+            ->getResultArray();
+
+        // Membentuk array bersarang
+        foreach ($result as &$row) {
+            $row['program_studi'] = [
+                'nama' => $row['program_studi_nama']
+            ];
+            unset($row['program_studi_nama']);  // Hapus alias yang tidak diperlukan
+        }
+
+        return $result;
     }
 }
