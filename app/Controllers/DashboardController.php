@@ -1,10 +1,40 @@
 <?php namespace App\Controllers;
 
+use App\Models\DosenModel;
+use App\Models\KelasModel;
+use App\Models\MahasiswaModel;
 use App\Models\MataKuliahModel;
+use App\Models\ProgramStudiModel;
+use App\Models\RuanganModel;
+use App\Models\WaktuKuliahModel;
 
 class DashboardController extends BaseController
 {
     public function index() {
-        return view('dashboard/index');
+        // Inisialisasi model
+        $programStudiModel = new ProgramStudiModel();
+        $mataKuliahModel = new MataKuliahModel();
+        $ruanganModel = new RuanganModel();
+        $dosenModel = new DosenModel();
+        $mahasiswaModel = new MahasiswaModel();
+        $kelasModel = new KelasModel();
+        $waktuKuliahModel = new WaktuKuliahModel();
+
+        // Mengambil jumlah data dari setiap tabel
+        $data = [
+            'programStudi' => $programStudiModel->countAll(),
+            'mataKuliah' => $mataKuliahModel->countAll(),
+            'ruangan' => $ruanganModel->countAll(),
+            'dosen' => $dosenModel->countAll(),
+            'mahasiswa' => $mahasiswaModel->countAll(),
+            'kelas' => $kelasModel->countAll(),
+            'waktuKuliah' => $waktuKuliahModel->countAll(),
+            'jadwal' => 0
+        ];
+
+        // Mengirimkan data ke view
+        return view('dashboard/index', [
+            'data' => $data
+        ]);
     }
 }

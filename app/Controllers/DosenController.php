@@ -11,7 +11,6 @@ class DosenController extends BaseController
     {
         $this->model = new DosenModel();
         $this->programStudiModel = new ProgramStudiModel();
-
     }
 
     public function index()

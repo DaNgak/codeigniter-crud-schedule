@@ -1,97 +1,28 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Services;
 
-use App\Controllers\BaseController;
-use App\Models\DosenModel;
-use App\Models\KelasModel;
-use App\Models\MataKuliahModel;
-use App\Models\ProgramStudiModel;
-use App\Models\RuanganModel;
-use App\Models\WaktuKuliahModel;
-use App\Services\GeneticAlgorithmService;
-
-class JadwalController extends BaseController
+class GeneticAlgorithmService
 {
-    private $jadwalModel, $programStudiModel, $geneticAlgorithmService;
+    // private $kelasModel, $mataKuliahModel, $ruanganModel, $dosenModel, $waktuKuliahModel;
+
+    // public function __construct()
+    // {
+    //     // Inisialisasi model yang diperlukan
+    //     $this->kelasModel = new KelasModel();
+    //     $this->mataKuliahModel = new MataKuliahModel();
+    //     $this->ruanganModel = new RuanganModel();
+    //     $this->dosenModel = new DosenModel();
+    //     $this->waktuKuliahModel = new WaktuKuliahModel();
+    // }
     
-    public function __construct()
-    {
-        // $this->jadwalModel = new JadwalModel();
-        $this->programStudiModel = new ProgramStudiModel();
-        $this->geneticAlgorithmService = new GeneticAlgorithmService();
-    }
-
-    public function index()
-    {
-        
-    }
-
-    public function create()
-    {
-        $data['programStudi'] = $this->programStudiModel->findAll();
-        $data['tahunAjaran'] = [
-            ['id' => 1, 'periode' => '2020/2021', 'semester' => 'Ganjil'],
-            ['id' => 2, 'periode' => '2020/2021', 'semester' => 'Genap'],
-            ['id' => 3, 'periode' => '2021/2022', 'semester' => 'Ganjil'],
-            ['id' => 4, 'periode' => '2021/2022', 'semester' => 'Genap'],
-            ['id' => 5, 'periode' => '2022/2023', 'semester' => 'Ganjil'],
-            ['id' => 6, 'periode' => '2022/2023', 'semester' => 'Genap'],
-            ['id' => 7, 'periode' => '2023/2024', 'semester' => 'Ganjil'],
-            ['id' => 8, 'periode' => '2023/2024', 'semester' => 'Genap'],
-        ];
-        return view('dashboard/jadwal/create', $data);
-    }
-
-    public function generate()
-    {
-        // return var_dump([
-        //     'program_studi_id' => $this->request->getPost('program_studi_id'),
-        //     'tahun_ajaran_id' => $this->request->getPost('tahun_ajaran_id')
-        // ]);
-        // Ambil parameter dari request POST
-        $programStudiId = $this->request->getPost('program_studi_id');
-        $tahunAjaranId = $this->request->getPost('tahun_ajaran_id');
-        
-         // Ambil data dari model berdasarkan program_studi_id
-        $kelasModel = new KelasModel();
-        $mataKuliahModel = new MataKuliahModel();
-        $ruanganModel = new RuanganModel();
-        $dosenModel = new DosenModel();
-        $waktuKuliahModel = new WaktuKuliahModel();
-
-        $kelasList = $kelasModel->where('program_studi_id', $programStudiId)->findAll();
-        $mataKuliahList = $mataKuliahModel->where('program_studi_id', $programStudiId)->findAll();
-        $ruanganList = $ruanganModel->where('program_studi_id', $programStudiId)->findAll();
-        $waktuKuliahList = $waktuKuliahModel->findAll(); // Mengambil semua data waktu kuliah
-        $dosenList = $dosenModel->where('program_studi_id', $programStudiId)->findAll();       
-        //  // Tampilkan hanya satu data dari masing-masing query
-        // return var_dump([
-        //     'program_studi_id' => $programStudiId,
-        //     'tahun_ajaran_id' => $tahunAjaranId,
-        //     'kelas' => isset($kelas[0]) ? $kelas[0] : 'Tidak ada data', // Tampilkan satu data
-        //     'mata_kuliah' => isset($mataKuliah[0]) ? $mataKuliah[0] : 'Tidak ada data', // Tampilkan satu data
-        //     'ruangan' => isset($ruangan[0]) ? $ruangan[0] : 'Tidak ada data', // Tampilkan satu data
-        //     'waktu_kuliah' => isset($waktuKuliah[0]) ? $waktuKuliah[0] : 'Tidak ada data', // Tampilkan satu data
-        //     'dosen' => isset($dosen[0]) ? $dosen[0] : 'Tidak ada data' // Tampilkan satu data
-        // ]);
-        // Parameter dan eksekusi
-        $population_size = 10;
-        $generations = 100;
-
-        // Hasil dari algoritma genetika
-        // $result = $this->geneticAlgorithmService->genetic_algorithm($kelasList, $mataKuliahList, $ruanganList, $waktuKuliahList, $dosenList, $population_size, $generations);
-        $result = $this->genetic_algorithm($kelasList, $mataKuliahList, $ruanganList, $waktuKuliahList, $dosenList, $population_size, $generations);
-        // return var_dump($result);
-    }
-
     /// Inisialisasi individu
     function create_individual($kelasList, $matkulList, $ruangList, $waktuList, $dosenList) {
         $individu = [];
         $schedules = []; // Untuk melacak jadwal yang sudah ada
+
         // Loop melalui setiap kelas dan atur mata kuliah mereka
         foreach ($kelasList as $kelas) {
-            
             foreach ($matkulList as $matkul) {
                 $is_unique = false;
 
@@ -103,16 +34,15 @@ class JadwalController extends BaseController
                         'waktu_kuliah' => $waktuList[array_rand($waktuList)],
                         'dosen' => $dosenList[array_rand($dosenList)],
                     ];
-                    // return var_dump($new_schedule['kelas']->kode);
                     $is_unique = true;
                     foreach ($schedules as $schedule) {
-                        if ($new_schedule['kelas']->kode === $schedule['kelas']->kode &&
-                            $new_schedule['mata_kuliah']->kode === $schedule['mata_kuliah']->kode &&
-                            $new_schedule['ruangan']->kode === $schedule['ruangan']->kode &&
-                            $new_schedule['waktu_kuliah']->hari === $schedule['waktu_kuliah']->hari &&
-                            $new_schedule['waktu_kuliah']->jam_mulai === $schedule['waktu_kuliah']->jam_mulai &&
-                            $new_schedule['waktu_kuliah']->jam_selesai === $schedule['waktu_kuliah']->jam_selesai &&
-                            $new_schedule['dosen']->nama === $schedule['dosen']->nama) {
+                        if ($new_schedule['kelas']['kode'] === $schedule['kelas']['kode'] &&
+                            $new_schedule['mata_kuliah']['kode'] === $schedule['mata_kuliah']['kode'] &&
+                            $new_schedule['ruangan']['kode'] === $schedule['ruangan']['kode'] &&
+                            $new_schedule['waktu_kuliah']['hari'] === $schedule['waktu_kuliah']['hari'] &&
+                            $new_schedule['waktu_kuliah']['jam_mulai'] === $schedule['waktu_kuliah']['jam_mulai'] &&
+                            $new_schedule['waktu_kuliah']['jam_selesai'] === $schedule['waktu_kuliah']['jam_selesai'] &&
+                            $new_schedule['dosen']['nama'] === $schedule['dosen']['nama']) {
                             $is_unique = false;
                             break;
                         }
@@ -144,23 +74,23 @@ class JadwalController extends BaseController
         // Cek benturan waktu dan ruang antar jadwal
         for ($i = 0; $i < $count; $i++) {
             for ($j = $i + 1; $j < $count; $j++) {
-                if ($individual[$i]['ruangan']->kode === $individual[$j]['ruangan']->kode &&
-                    $individual[$i]['waktu_kuliah']->hari === $individual[$j]['waktu_kuliah']->hari &&
-                    $individual[$i]['waktu_kuliah']->jam_mulai === $individual[$j]['waktu_kuliah']->jam_mulai &&
-                    $individual[$i]['waktu_kuliah']->jam_selesai === $individual[$j]['waktu_kuliah']->jam_selesai) {
+                if ($individual[$i]['ruangan']['kode'] === $individual[$j]['ruangan']['kode'] &&
+                    $individual[$i]['waktu_kuliah']['hari'] === $individual[$j]['waktu_kuliah']['hari'] &&
+                    $individual[$i]['waktu_kuliah']['jam_mulai'] === $individual[$j]['waktu_kuliah']['jam_mulai'] &&
+                    $individual[$i]['waktu_kuliah']['jam_selesai'] === $individual[$j]['waktu_kuliah']['jam_selesai']) {
                     // Cek apakah dua kelas yang berbeda dijadwalkan di ruangan, waktu dan dosen yang sama
-                    if ($individual[$i]['kelas']->kode !== $individual[$j]['kelas']->kode) {
+                    if ($individual[$i]['kelas']['kode'] !== $individual[$j]['kelas']['kode']) {
                         $conflicts++;
                     }
                 }
-            }
-            // Memeriksa keunikan jadwal dalam individu
-            $schedule_key = "{$individual[$i]['kelas']->kode}-{$individual[$i]['mata_kuliah']->kode}-{$individual[$i]['ruangan']->kode}-{$individual[$i]['waktu_kuliah']->hari}-{$individual[$i]['waktu_kuliah']->jam_mulai}-{$individual[$i]['waktu_kuliah']->jam_selesai}-{$individual[$i]['dosen']->nama}";
-            if (in_array($schedule_key, $schedules)) {
-                $conflicts++;
-            } else {
-                $schedules[] = $schedule_key;
-            }
+                // Memeriksa keunikan jadwal dalam individu
+                $schedule_key = "{$individual[$i]['kelas']['kode']}-{$individual[$i]['mata_kuliah']['kode']}-{$individual[$i]['ruangan']['kode']}-{$individual[$i]['waktu_kuliah']['hari']}-{$individual[$i]['waktu_kuliah']['jam_mulai']}-{$individual[$i]['waktu_kuliah']['jam_selesai']}-{$individual[$i]['dosen']['nama']}";
+                if (in_array($schedule_key, $schedules)) {
+                    $conflicts++;
+                } else {
+                    $schedules[] = $schedule_key;
+                }
+            }            
         }
 
         return 1 / (1 + $conflicts); // Fitness lebih tinggi jika konflik lebih sedikit
@@ -207,13 +137,13 @@ class JadwalController extends BaseController
             $is_unique = true;
             foreach ($individual as $schedule) {
                 if ($schedule !== $new_schedule &&
-                    $new_schedule['kelas']->kode === $schedule['kelas']->kode &&
-                    $new_schedule['mata_kuliah']->kode === $schedule['mata_kuliah']->kode &&
-                    $new_schedule['ruangan']->kode === $schedule['ruangan']->kode &&
-                    $new_schedule['waktu_kuliah']->hari === $schedule['waktu_kuliah']->hari &&
-                    $new_schedule['waktu_kuliah']->jam_mulai === $schedule['waktu_kuliah']->jam_mulai &&
-                    $new_schedule['waktu_kuliah']->jam_selesai === $schedule['waktu_kuliah']->jam_selesai &&
-                    $new_schedule['dosen']->nama === $schedule['dosen']->nama) {
+                    $new_schedule['kelas']['kode'] === $schedule['kelas']['kode'] &&
+                    $new_schedule['mata_kuliah']['kode'] === $schedule['mata_kuliah']['kode'] &&
+                    $new_schedule['ruangan']['kode'] === $schedule['ruangan']['kode'] &&
+                    $new_schedule['waktu_kuliah']['hari'] === $schedule['waktu_kuliah']['hari'] &&
+                    $new_schedule['waktu_kuliah']['jam_mulai'] === $schedule['waktu_kuliah']['jam_mulai'] &&
+                    $new_schedule['waktu_kuliah']['jam_selesai'] === $schedule['waktu_kuliah']['jam_selesai'] &&
+                    $new_schedule['dosen']['nama'] === $schedule['dosen']['nama']) {
                     $is_unique = false;
                     break;
                 }
@@ -226,16 +156,6 @@ class JadwalController extends BaseController
 
     // Menjalankan algoritma genetika
     function genetic_algorithm($kelasList, $matkulList, $ruangList, $waktuList, $dosenList, $population_size, $generations) {
-        // foreach ($kelasList as $kelas) {
-        //     $new_schedule = [
-        //         'kelas' => $kelas,
-        //         // 'mata_kuliah' => $matkul,
-        //         'ruangan' => $ruangList[array_rand($ruangList)],
-        //         'waktu_kuliah' => $waktuList[array_rand($waktuList)],
-        //         'dosen' => $dosenList[array_rand($dosenList)],
-        //     ];
-        //     return var_dump($new_schedule['kelas']->kode);
-        // }
         $time_start = microtime(true); // Mulai waktu eksekusi
         $population = $this->create_population($population_size, $kelasList, $matkulList, $ruangList, $waktuList, $dosenList);
         $best_fitness = 0;
@@ -255,8 +175,8 @@ class JadwalController extends BaseController
                 echo "Individu $index - Fitness: {$fitness_values[$index]}\n <br/>";
                 // echo "<pre>";
                 foreach ($individual as $schedule) {
-                    echo " [{$schedule['kelas']->kode}, {$schedule['mata_kuliah']->kode}, {$schedule['ruangan']->kode}, {$schedule['waktu_kuliah']->hari} {$schedule['waktu_kuliah']->jam_mulai} - {$schedule['waktu_kuliah']->jam_selesai}, {$schedule['dosen']->nama}] ||| \n";
-                }
+                    echo " [{$schedule['kelas']['kode']}, {$schedule['mata_kuliah']['kode']}, {$schedule['ruangan']['kode']}, {$schedule['waktu_kuliah']['hari']} {$schedule['waktu_kuliah']['jam_mulai']} - {$schedule['waktu_kuliah']['jam_selesai']}, {$schedule['dosen']['nama']}] ||| \n";
+                }                
                 // echo "</pre><br/>";
                 echo "<br/><br/>";
             }
@@ -312,8 +232,8 @@ class JadwalController extends BaseController
         echo "\r\nINDIVIDU TERBAIK      : \n";
         
         foreach ($best_individual as $schedule) {
-            echo "[Kelas: {$schedule['kelas']->kode}, Matkul: {$schedule['mata_kuliah']->kode}, Ruang: {$schedule['ruangan']->kode}, Waktu: {$schedule['waktu_kuliah']->hari} {$schedule['waktu_kuliah']->jam_mulai} - {$schedule['waktu_kuliah']->jam_selesai} , Dosen: {$schedule['dosen']->nama}]\n";
-        }
+            echo "[Kelas: {$schedule['kelas']['kode']}, Matkul: {$schedule['mata_kuliah']['kode']}, Ruang: {$schedule['ruangan']['kode']}, Waktu: {$schedule['waktu_kuliah']['hari']} {$schedule['waktu_kuliah']['jam_mulai']} - {$schedule['waktu_kuliah']['jam_selesai']} , Dosen: {$schedule['dosen']['nama']}]\n";
+        }        
 
         echo "<div class='notic'><strong>";
         if ($best_fitness == 1) {
