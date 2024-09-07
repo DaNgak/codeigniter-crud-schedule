@@ -79,9 +79,25 @@ class JadwalController extends BaseController
         $population_size = 10;
         $generations = 100;
 
+        $waktuList = $waktuKuliahList;
+        $waktu_kuliah = $waktuList[array_rand($waktuList)];
+
+        // Format waktu menjadi HH:MM
+        $jam_mulai = date('H:i', strtotime($waktu_kuliah['jam_mulai']));
+        $jam_selesai = date('H:i', strtotime($waktu_kuliah['jam_selesai']));
+
+        // Gabungkan jam_mulai dan jam_selesai
+        $jam_kuliah = $jam_mulai . ' - ' . $jam_selesai;
+
+        $arr = [
+            'waktu_kuliah' => array_merge($waktu_kuliah, ['jam' => $jam_kuliah]),
+        ];
+
+        // var_dump($arr);
+
         // Hasil dari algoritma genetika
-        // $result = $this->geneticAlgorithmService->genetic_algorithm($kelasList, $mataKuliahList, $ruanganList, $waktuKuliahList, $dosenList, $population_size, $generations);
-        $result = $this->genetic_algorithm($kelasList, $mataKuliahList, $ruanganList, $waktuKuliahList, $dosenList, $population_size, $generations);
+        $result = $this->geneticAlgorithmService->genetic_algorithm($kelasList, $mataKuliahList, $ruanganList, $waktuKuliahList, $dosenList, $population_size, $generations);
+        // $result = $this->genetic_algorithm($kelasList, $mataKuliahList, $ruanganList, $waktuKuliahList, $dosenList, $population_size, $generations);
         // return var_dump($result);
     }
 

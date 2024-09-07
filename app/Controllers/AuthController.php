@@ -21,8 +21,22 @@ class AuthController extends Controller
         // Validasi input
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'email'    => 'required|valid_email',
-            'password' => 'required|min_length[8]'
+            'email' => [
+                'label' => 'Email',
+                'rules' => 'required|valid_email',
+                'errors' => [
+                    'required'    => 'Email wajib diisi.',
+                    'valid_email' => 'Harap masukkan alamat email yang valid.'
+                ]
+            ],
+            'password' => [
+                'label' => 'Password',
+                'rules' => 'required|min_length[8]',
+                'errors' => [
+                    'required'   => 'Password wajib diisi.',
+                    'min_length' => 'Password harus memiliki setidaknya {param} karakter.'
+                ]
+            ]
         ]);
         
         if (!$validation->withRequest($this->request)->run()) {
@@ -48,9 +62,13 @@ class AuthController extends Controller
     
         if ($data && password_verify($password, $data['password'])) {
             $ses_data = [
-                'id'        => $data['id'],
-                'email'     => $data['email'],
-                'isLoggedIn' => true
+                'isLoggedIn' => true,
+                'user'      => [
+                    'name'     => $data['name'],
+                    'email'    => $data['email'],
+                    // 'password' => $data['password'], // Harus hati-hati dengan penyimpanan password dalam sesi
+                    'profil'   => $data['profil']
+                ]
             ];
             $session->set($ses_data);
             $session->setFlashdata('message', [

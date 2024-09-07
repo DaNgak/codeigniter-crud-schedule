@@ -8,6 +8,12 @@ class MataKuliahSeeder extends Seeder
 {
     public function run()
     {
+        // Nonaktifkan foreign key checks
+        $this->db->query('SET FOREIGN_KEY_CHECKS=0;');
+
+        // Drop semua data dari tabel mata_kuliah
+        $this->db->table('mata_kuliah')->truncate();
+
         $data = [
             ['nama' => 'Pemrograman Web', 'kode' => 'PW101', 'program_studi_id' => 1],
             ['nama' => 'Basis Data', 'kode' => 'BD101', 'program_studi_id' => 1],
@@ -23,5 +29,8 @@ class MataKuliahSeeder extends Seeder
 
         // Insert ke tabel mata_kuliah
         $this->db->table('mata_kuliah')->insertBatch($data);
+
+        // Aktifkan kembali foreign key checks
+        $this->db->query('SET FOREIGN_KEY_CHECKS=1;');
     }
 }
