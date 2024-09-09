@@ -103,37 +103,46 @@ class GeneticAlgorithmService
     // }
 
     function calculate_fitness($individual) {
-        $conflicts = 0;
-        $count = count($individual);
+        // $conflicts = 0;
+        // $count = count($individual);
     
-        // Cek benturan waktu, ruang, dan dosen antar jadwal
-        for ($i = 0; $i < $count; $i++) {
-            for ($j = $i + 1; $j < $count; $j++) {
-                // Cek jika jadwal bertabrakan
-                if ($individual[$i]['ruangan']['kode'] === $individual[$j]['ruangan']['kode'] &&
-                    $individual[$i]['waktu_kuliah']['hari'] === $individual[$j]['waktu_kuliah']['hari'] &&
-                    $individual[$i]['waktu_kuliah']['jam'] === $individual[$j]['waktu_kuliah']['jam'] &&
-                    $individual[$i]['dosen']['nama'] === $individual[$j]['dosen']['nama']) {
+        // // Cek benturan waktu, ruang, dan dosen antar jadwal
+        // for ($i = 0; $i < $count; $i++) {
+        //     for ($j = $i + 1; $j < $count; $j++) {
+        //         // Cek jika jadwal bertabrakan
+        //         if ($individual[$i]['ruangan']['kode'] === $individual[$j]['ruangan']['kode'] &&
+        //             $individual[$i]['waktu_kuliah']['hari'] === $individual[$j]['waktu_kuliah']['hari'] &&
+        //             $individual[$i]['waktu_kuliah']['jam'] === $individual[$j]['waktu_kuliah']['jam'] &&
+        //             $individual[$i]['dosen']['nama'] === $individual[$j]['dosen']['nama']) {
                     
-                    // Cek apakah dua kelas yang berbeda dijadwalkan di ruangan, waktu dan dosen yang sama
-                    if ($individual[$i]['kelas']['kode'] !== $individual[$j]['kelas']['kode']) {
-                        $conflicts++;
-                    }
-                }
-            }
-        }
+        //             // Cek apakah dua kelas yang berbeda dijadwalkan di ruangan, waktu dan dosen yang sama
+        //             if ($individual[$i]['kelas']['kode'] !== $individual[$j]['kelas']['kode']) {
+        //                 $conflicts++;
+        //             }
+        //         }
+        //     }
+        // }
     
-        // Menghindari keunikan jadwal dalam individu
-        $schedules = [];
-        foreach ($individual as $schedule) {
-            $schedule_key = "{$schedule['kelas']['kode']}-{$schedule['mata_kuliah']['kode']}-{$schedule['ruangan']['kode']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}-{$schedule['dosen']['nama']}";
-            if (in_array($schedule_key, $schedules)) {
-                $conflicts++; // Menandakan adanya konflik jika jadwal duplikat ditemukan
-            } else {
-                $schedules[] = $schedule_key;
-            }
-        }
+        // // Menghindari keunikan jadwal dalam individu
+        // $schedules = [];
+        // foreach ($individual as $schedule) {
+        //     $schedule_key = "{$schedule['kelas']['kode']}-{$schedule['mata_kuliah']['kode']}-{$schedule['ruangan']['kode']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}-{$schedule['dosen']['nama']}";
+        //     if (in_array($schedule_key, $schedules)) {
+        //         $conflicts++; // Menandakan adanya konflik jika jadwal duplikat ditemukan
+        //     } else {
+        //         $schedules[] = $schedule_key;
+        //     }
+        // }
     
+        // // Fitness lebih tinggi jika konflik lebih sedikit
+        // return 1 / (1 + $conflicts);
+
+        // Panggil calculate_conflict untuk menghitung konflik
+        $conflict_result = $this->calculate_conflict($individual);
+
+        // Jumlah konflik diambil dari hasil calculate_conflict
+        $conflicts = $conflict_result['conflict'];
+
         // Fitness lebih tinggi jika konflik lebih sedikit
         return 1 / (1 + $conflicts);
     }
@@ -199,66 +208,116 @@ class GeneticAlgorithmService
         return $individual;
     }
 
+    // function calculate_conflict($individual) {
+    //     $conflicts = 0;
+    //     $count = count($individual);
+
+    //     // Membuat array untuk melacak konflik
+    //     $ruangan_with_time_map = [];
+    //     $kelas_with_time_map = [];
+    //     $kelas_with_dosen_map = [];
+        
+    //     foreach ($individual as $index => $schedule) {
+    //         $ruangan_time_key = "{$schedule['ruangan']['kode']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}";
+    //         $kelas_time_key = "{$schedule['kelas']['kode']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}";
+    //         $kelas_dosen_key = "{$schedule['kelas']['kode']}-{$schedule['dosen']['nama']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}";
+            
+    //         // Format data
+    //         $formatted_data = function($data) {
+    //             return "[Kelas: {$data['kelas']['kode']}, Matkul: {$data['mata_kuliah']['kode']}, Ruang: {$data['ruangan']['kode']}, Waktu: {$data['waktu_kuliah']['hari']} ({$data['waktu_kuliah']['jam']}) {$data['waktu_kuliah']['jam_mulai']} - {$data['waktu_kuliah']['jam_selesai']}, Dosen: {$data['dosen']['nama']}]";
+    //         };
+            
+    //         // Cek benturan ruangan
+    //         if (isset($ruangan_with_time_map[$ruangan_time_key])) {
+    //             $conflicts++;
+    //             $conflict_details[] = "Konflik Ke-" . $conflicts;
+    //             $conflict_details[] = "Konflik Ruangan: Baris " . ($index + 1) . " dan Baris " . ($ruangan_with_time_map[$ruangan_time_key] + 1);
+    //             $conflict_details[] = "Data 1: " . $formatted_data($individual[$index]);
+    //             $conflict_details[] = "Data 2: " . $formatted_data($individual[$ruangan_with_time_map[$ruangan_time_key]]);
+    //             $conflict_details[] = ""; // Menambahkan baris kosong untuk pemisah
+    //         } else {
+    //             $ruangan_with_time_map[$ruangan_time_key] = $index;
+    //         }
+    
+    //         // Cek benturan kelas
+    //         if (isset($kelas_with_time_map[$kelas_time_key])) {
+    //             $conflicts++;
+    //             $conflict_details[] = "Konflik Ke-" . $conflicts;
+    //             $conflict_details[] = "Konflik Kelas: Baris " . ($index + 1) . " dan Baris " . ($kelas_with_time_map[$kelas_time_key] + 1);
+    //             $conflict_details[] = "Data 1: " . $formatted_data($individual[$index]);
+    //             $conflict_details[] = "Data 2: " . $formatted_data($individual[$kelas_with_time_map[$kelas_time_key]]);
+    //             $conflict_details[] = ""; // Menambahkan baris kosong untuk pemisah
+    //         } else {
+    //             $kelas_with_time_map[$kelas_time_key] = $index;
+    //         }
+    
+    //         // Cek benturan kelas dan dosen
+    //         if (isset($kelas_with_dosen_map[$kelas_dosen_key])) {
+    //             $conflicts++;
+    //             $conflict_details[] = "Konflik Ke-" . $conflicts;
+    //             $conflict_details[] = "Konflik Kelas dan Dosen: Baris " . ($index + 1) . " dan Baris " . ($kelas_with_dosen_map[$kelas_dosen_key] + 1);
+    //             $conflict_details[] = "Data 1: " . $formatted_data($individual[$index]);
+    //             $conflict_details[] = "Data 2: " . $formatted_data($individual[$kelas_with_dosen_map[$kelas_dosen_key]]);
+    //             $conflict_details[] = ""; // Menambahkan baris kosong untuk pemisah
+    //         } else {
+    //             $kelas_with_dosen_map[$kelas_dosen_key] = $index;
+    //         }
+    //     }
+    
+    //     // Mengembalikan hasil
+    //     $console = "<pre>" . implode("\n", $conflict_details) . "</pre>";
+        
+    //     // Fitness lebih tinggi jika konflik lebih sedikit
+    //     return [
+    //         'conflict' => $conflicts,
+    //         'debug_conflict' => $console
+    //     ];
+    // }
     function calculate_conflict($individual) {
         $conflicts = 0;
-        $count = count($individual);
-
-        // Membuat array untuk melacak konflik
         $ruangan_with_time_map = [];
-        $kelas_with_time_map = [];
-        $kelas_with_dosen_map = [];
-        
+        $dosen_with_time_map = [];
+        $conflict_details = [];
         foreach ($individual as $index => $schedule) {
+            // Create unique keys for room-time and instructor-time conflicts
             $ruangan_time_key = "{$schedule['ruangan']['kode']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}";
-            $kelas_time_key = "{$schedule['kelas']['kode']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}";
-            $kelas_dosen_key = "{$schedule['kelas']['kode']}-{$schedule['dosen']['nama']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}";
-            
-            // Format data
+            $dosen_time_key = "{$schedule['dosen']['nama']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}";
+    
+            // Format the schedule data for better readability in conflicts
             $formatted_data = function($data) {
-                return "[Kelas: {$data['kelas']['kode']}, Matkul: {$data['mata_kuliah']['kode']}, Ruang: {$data['ruangan']['kode']}, Waktu: {$data['waktu_kuliah']['hari']} ({$data['waktu_kuliah']['jam']}) {$data['waktu_kuliah']['jam_mulai']} - {$data['waktu_kuliah']['jam_selesai']}, Dosen: {$data['dosen']['nama']}]";
+                return "[Kelas: {$data['kelas']['kode']}, Matkul: {$data['mata_kuliah']['kode']}, Ruang: {$data['ruangan']['kode']}, Waktu: ({$data['waktu_kuliah']['id']}) {$data['waktu_kuliah']['hari']}/{$data['waktu_kuliah']['jam']}, Dosen: {$data['dosen']['nama']}]";
             };
             
-            // Cek benturan ruangan
+            // Check for room-time conflicts
             if (isset($ruangan_with_time_map[$ruangan_time_key])) {
                 $conflicts++;
                 $conflict_details[] = "Konflik Ke-" . $conflicts;
                 $conflict_details[] = "Konflik Ruangan: Baris " . ($index + 1) . " dan Baris " . ($ruangan_with_time_map[$ruangan_time_key] + 1);
                 $conflict_details[] = "Data 1: " . $formatted_data($individual[$index]);
                 $conflict_details[] = "Data 2: " . $formatted_data($individual[$ruangan_with_time_map[$ruangan_time_key]]);
-                $conflict_details[] = ""; // Menambahkan baris kosong untuk pemisah
+                $conflict_details[] = ""; // Add empty line as a separator
             } else {
+                // No conflict, store this room-time pairing
                 $ruangan_with_time_map[$ruangan_time_key] = $index;
             }
     
-            // Cek benturan kelas
-            if (isset($kelas_with_time_map[$kelas_time_key])) {
+            // Check for instructor-time conflicts
+            if (isset($dosen_with_time_map[$dosen_time_key])) {
                 $conflicts++;
                 $conflict_details[] = "Konflik Ke-" . $conflicts;
-                $conflict_details[] = "Konflik Kelas: Baris " . ($index + 1) . " dan Baris " . ($kelas_with_time_map[$kelas_time_key] + 1);
+                $conflict_details[] = "Konflik Dosen: Baris " . ($index + 1) . " dan Baris " . ($dosen_with_time_map[$dosen_time_key] + 1);
                 $conflict_details[] = "Data 1: " . $formatted_data($individual[$index]);
-                $conflict_details[] = "Data 2: " . $formatted_data($individual[$kelas_with_time_map[$kelas_time_key]]);
-                $conflict_details[] = ""; // Menambahkan baris kosong untuk pemisah
+                $conflict_details[] = "Data 2: " . $formatted_data($individual[$dosen_with_time_map[$dosen_time_key]]);
+                $conflict_details[] = ""; // Add empty line as a separator
             } else {
-                $kelas_with_time_map[$kelas_time_key] = $index;
-            }
-    
-            // Cek benturan kelas dan dosen
-            if (isset($kelas_with_dosen_map[$kelas_dosen_key])) {
-                $conflicts++;
-                $conflict_details[] = "Konflik Ke-" . $conflicts;
-                $conflict_details[] = "Konflik Kelas dan Dosen: Baris " . ($index + 1) . " dan Baris " . ($kelas_with_dosen_map[$kelas_dosen_key] + 1);
-                $conflict_details[] = "Data 1: " . $formatted_data($individual[$index]);
-                $conflict_details[] = "Data 2: " . $formatted_data($individual[$kelas_with_dosen_map[$kelas_dosen_key]]);
-                $conflict_details[] = ""; // Menambahkan baris kosong untuk pemisah
-            } else {
-                $kelas_with_dosen_map[$kelas_dosen_key] = $index;
+                // No conflict, store this instructor-time pairing
+                $dosen_with_time_map[$dosen_time_key] = $index;
             }
         }
     
-        // Mengembalikan hasil
+        // Return conflict details
         $console = "<pre>" . implode("\n", $conflict_details) . "</pre>";
-        
-        // Fitness lebih tinggi jika konflik lebih sedikit
+    
         return [
             'conflict' => $conflicts,
             'debug_conflict' => $console
@@ -281,15 +340,15 @@ class GeneticAlgorithmService
                 $fitness_values[] = $this->calculate_fitness($individual);
             }
 
-            echo "=======Generasi $generation:\n =========== <br/>";
+            echo "=======Generasi $generation: =========== <br/>";
             foreach ($population as $index => $individual) {
-                echo "Individu $index - Fitness: {$fitness_values[$index]}\n <br/>";
-                // echo "<pre>";
+                echo "Individu $index - Fitness: {$fitness_values[$index]}<br/>";
+                echo "<pre>";
                 foreach ($individual as $schedule) {
                     echo " [{$schedule['kelas']['kode']}, {$schedule['mata_kuliah']['kode']}, {$schedule['ruangan']['kode']}, {$schedule['waktu_kuliah']['hari']} {$schedule['waktu_kuliah']['jam']}, {$schedule['dosen']['nama']}] ||| \n";
                 }                
-                // echo "</pre><br/>";
-                echo "<br/><br/>";
+                echo "</pre><br/>";
+                // echo "<br/><br/>";
             }
 
             // Mencari fitness terbaik dalam populasi ini
@@ -342,12 +401,12 @@ class GeneticAlgorithmService
         echo "\r\nGENERASI              : " . $best_generation;
         echo "\r\nEXECUTION TIME        : " . $execution_time . " detik";
         echo "\r\nMEMORY USAGE          : " . round(memory_get_usage() / 1024 / 1024, 2) . " MB";
-        echo "\r\nJUMLAH KONFLIk        : " . $conflict_result['conflict'];
+        echo "\r\nJUMLAH KONFLIK        : " . $conflict_result['conflict'];
         echo "\r\nINDIVIDU TERBAIK      : \n";
         
         foreach ($best_individual as $index => $schedule) {
             $number = $index+=1;
-            echo "[{$number}][Kelas: {$schedule['kelas']['kode']}, Matkul: {$schedule['mata_kuliah']['kode']}, Ruang: {$schedule['ruangan']['kode']}, Waktu: {$schedule['waktu_kuliah']['hari']} ({$schedule['waktu_kuliah']['id']}) {$schedule['waktu_kuliah']['jam']}, Dosen: {$schedule['dosen']['nama']}]\n";
+            echo "[{$number}][Kelas: {$schedule['kelas']['kode']}, Matkul: {$schedule['mata_kuliah']['kode']}, Ruang: {$schedule['ruangan']['kode']}, Waktu: ({$schedule['waktu_kuliah']['id']}) {$schedule['waktu_kuliah']['hari']}/{$schedule['waktu_kuliah']['jam']}, Dosen: {$schedule['dosen']['nama']}]\n";
         }        
 
         echo "<div class='notic'><strong>";
@@ -358,9 +417,9 @@ class GeneticAlgorithmService
             // Jika fitness terbaik belum mencapai 1, tampilkan informasi generasi dan individu terbaik
             echo "\r\nPesan         : <span style='font-family-sans'>Individu terbaik ditemukan pada generasi ke-{$best_generation} dan individu ke-{$best_individual_index}, namun fitness belum mencapai 1.</span>";             
         }
-        echo "</strong></div><div>Melakukan looping generasi ke {$generation_reached} dari max generasi {$generations}</div></pre>";
+        echo "</strong></div>\n<div>Melakukan looping generasi ke {$generation_reached} dari max generasi {$generations}</div></pre>";
 
-        echo "============ Konflik ============";
+        echo "<br/>============ Konflik ============";
         echo $conflict_result['debug_conflict']; // Menampilkan detail konflik
 
         return $best_individual;

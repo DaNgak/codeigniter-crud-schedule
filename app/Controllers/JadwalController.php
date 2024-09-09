@@ -77,7 +77,7 @@ class JadwalController extends BaseController
         // ]);
         // Parameter dan eksekusi
         $population_size = 10;
-        $generations = 100;
+        $generations = 300;
 
         $waktuList = $waktuKuliahList;
         $waktu_kuliah = $waktuList[array_rand($waktuList)];
