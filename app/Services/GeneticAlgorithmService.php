@@ -324,8 +324,109 @@ class GeneticAlgorithmService
         ];
     }
 
-    // Menjalankan algoritma genetika
-    function genetic_algorithm($kelasList, $matkulList, $ruangList, $waktuList, $dosenList, $population_size, $generations) {
+    // // Menjalankan algoritma genetika (debug)
+    // function genetic_algorithm($kelasList, $matkulList, $ruangList, $waktuList, $dosenList, $population_size, $max_generation) {
+    //     $time_start = microtime(true); // Mulai waktu eksekusi
+    //     $population = $this->create_population($population_size, $kelasList, $matkulList, $ruangList, $waktuList, $dosenList);
+    //     $best_fitness = 0;
+    //     $best_individual = null;
+    //     $best_individual_index = 0;
+    //     $best_generation = 0;
+    //     $generation_reached = 0;
+
+    //     for ($generation = 1; $generation <= $max_generation; $generation++) {
+    //         $fitness_values = [];
+    //         foreach ($population as $individual) {
+    //             $fitness_values[] = $this->calculate_fitness($individual);
+    //         }
+
+    //         echo "=======Generasi $generation: =========== <br/>";
+    //         foreach ($population as $index => $individual) {
+    //             echo "Individu $index - Fitness: {$fitness_values[$index]}<br/>";
+    //             echo "<pre>";
+    //             foreach ($individual as $schedule) {
+    //                 echo " [{$schedule['kelas']['kode']}, {$schedule['mata_kuliah']['kode']}, {$schedule['ruangan']['kode']}, {$schedule['waktu_kuliah']['hari']} {$schedule['waktu_kuliah']['jam']}, {$schedule['dosen']['nama']}] ||| \n";
+    //             }                
+    //             echo "</pre><br/>";
+    //             // echo "<br/><br/>";
+    //         }
+
+    //         // Mencari fitness terbaik dalam populasi ini
+    //         $max_fitness = max($fitness_values);
+    //         if ($max_fitness >= $best_fitness) {
+    //             $best_fitness = $max_fitness;
+    //             $best_generation = $generation;
+    //             $best_individual = $population[array_search($max_fitness, $fitness_values)];
+    //             $best_individual_index = array_search($max_fitness, $fitness_values); // Simpan indeks individu terbaik
+    //         }
+
+    //         // Jika ada individu dengan fitness 1, berhenti
+    //         if ($best_fitness == 1) {
+    //             $generation_reached = $generation;
+    //             // $best_generation = $generation;
+    //             // $best_individual = $population[array_search($max_fitness, $fitness_values)];
+    //             // $best_individual_index = array_search($max_fitness, $fitness_values); // Simpan indeks individu terbaik
+    //             break;
+    //         }
+
+    //         // Seleksi dan pembentukan populasi baru
+    //         $new_population = [];
+    //         while (count($new_population) < $population_size) {
+    //             $parent1 = $this->roulette_wheel_selection($population, $fitness_values);
+    //             $parent2 = $this->roulette_wheel_selection($population, $fitness_values);
+    //             list($child1, $child2) = $this->crossover($parent1, $parent2);
+
+    //             $child1 = $this->mutate($child1, $ruangList, $waktuList, $dosenList);
+    //             $child2 = $this->mutate($child2, $ruangList, $waktuList, $dosenList);
+
+    //             $new_population[] = $child1;
+    //             if (count($new_population) < $population_size) {
+    //                 $new_population[] = $child2;
+    //             }
+    //         }
+
+    //         $population = $new_population;
+    //         $generation_reached = $generation; // Menyimpan generasi terakhir yang dicapai
+    //     }
+
+    //     // Setelah algoritma selesai, hitung waktu eksekusi dan tampilkan hasilnya
+    //     $time_end = microtime(true);
+    //     $execution_time = $time_end - $time_start;
+    //     // Menghitung konflik dan menyimpan detailnya
+    //     $conflict_result = $this->calculate_conflict($best_individual);
+        
+    //     // Menampilkan hasil terbaik
+    //     echo "<pre style='color:black; font-size:0.8rem'>========== HASIL ALGORITMA GENETIKA ========== \n";
+    //     echo "\r\nFITNESS TERBAIK       : " . $best_fitness;
+    //     echo "\r\nGENERASI              : " . $best_generation;
+    //     echo "\r\nEXECUTION TIME        : " . $execution_time . " detik";
+    //     echo "\r\nMEMORY USAGE          : " . round(memory_get_usage() / 1024 / 1024, 2) . " MB";
+    //     echo "\r\nJUMLAH KONFLIK        : " . $conflict_result['conflict'];
+    //     echo "\r\nINDIVIDU TERBAIK      : \n";
+
+    //     foreach ($best_individual as $index => $schedule) {
+    //         $number = $index+=1;
+    //         echo "[{$number}][Kelas: {$schedule['kelas']['kode']}, Matkul: {$schedule['mata_kuliah']['kode']}, Ruang: {$schedule['ruangan']['kode']}, Waktu: ({$schedule['waktu_kuliah']['id']}) {$schedule['waktu_kuliah']['hari']}/{$schedule['waktu_kuliah']['jam']}, Dosen: {$schedule['dosen']['nama']}]\n";
+    //     }        
+
+    //     echo "<div class='notic'><strong>";
+    //     if ($best_fitness == 1) {
+    //         // Jika fitness terbaik adalah 1, berarti individu terbaik ditemukan
+    //         echo "\r\nPesan         : <span style='font-family-sans'>Individu terbaik berhasil ditemukan pada generasi ke-{$best_generation} dan individu ke-{$best_individual_index}!</span>";             
+    //     } else {
+    //         // Jika fitness terbaik belum mencapai 1, tampilkan informasi generasi dan individu terbaik
+    //         echo "\r\nPesan         : <span style='font-family-sans'>Individu terbaik ditemukan pada generasi ke-{$best_generation} dan individu ke-{$best_individual_index}, namun fitness belum mencapai 1.</span>";             
+    //     }
+    //     echo "</strong></div>\n<div>Melakukan looping generasi ke {$generation_reached} dari max generasi {$max_generation}</div></pre>";
+
+    //     echo "<br/>============ Konflik ============";
+    //     echo $conflict_result['debug_conflict']; // Menampilkan detail konflik
+
+    //     return $best_individual;
+    // }
+
+    // Menjalankan algoritma genetika (api)
+    function genetic_algorithm($kelasList, $matkulList, $ruangList, $waktuList, $dosenList, $population_size, $max_generation) {
         $time_start = microtime(true); // Mulai waktu eksekusi
         $population = $this->create_population($population_size, $kelasList, $matkulList, $ruangList, $waktuList, $dosenList);
         $best_fitness = 0;
@@ -333,95 +434,104 @@ class GeneticAlgorithmService
         $best_individual_index = 0;
         $best_generation = 0;
         $generation_reached = 0;
-
-        for ($generation = 1; $generation <= $generations; $generation++) {
+        $debug_generation = ""; // Untuk menyimpan informasi tiap generasi
+    
+        for ($generation = 1; $generation <= $max_generation; $generation++) {
             $fitness_values = [];
             foreach ($population as $individual) {
                 $fitness_values[] = $this->calculate_fitness($individual);
             }
-
-            echo "=======Generasi $generation: =========== <br/>";
+    
+            // Simpan informasi generasi saat ini ke dalam variabel
+            $debug_generation .= "=======Generasi $generation: =========== <br/>";
             foreach ($population as $index => $individual) {
-                echo "Individu $index - Fitness: {$fitness_values[$index]}<br/>";
-                echo "<pre>";
+                $debug_generation .= "Individu $index - Fitness: {$fitness_values[$index]}<br/>";
+                $debug_generation .= "<pre>";
                 foreach ($individual as $schedule) {
-                    echo " [{$schedule['kelas']['kode']}, {$schedule['mata_kuliah']['kode']}, {$schedule['ruangan']['kode']}, {$schedule['waktu_kuliah']['hari']} {$schedule['waktu_kuliah']['jam']}, {$schedule['dosen']['nama']}] ||| \n";
-                }                
-                echo "</pre><br/>";
-                // echo "<br/><br/>";
+                    $debug_generation .= " [{$schedule['kelas']['kode']}, {$schedule['mata_kuliah']['kode']}, {$schedule['ruangan']['kode']}, {$schedule['waktu_kuliah']['hari']} {$schedule['waktu_kuliah']['jam']}, {$schedule['dosen']['nama']}] ||| \n";
+                }
+                $debug_generation .= "</pre><br/>";
             }
-
+    
             // Mencari fitness terbaik dalam populasi ini
             $max_fitness = max($fitness_values);
             if ($max_fitness >= $best_fitness) {
                 $best_fitness = $max_fitness;
                 $best_generation = $generation;
                 $best_individual = $population[array_search($max_fitness, $fitness_values)];
-                $best_individual_index = array_search($max_fitness, $fitness_values); // Simpan indeks individu terbaik
+                $best_individual_index = array_search($max_fitness, $fitness_values);
             }
-
+    
             // Jika ada individu dengan fitness 1, berhenti
             if ($best_fitness == 1) {
                 $generation_reached = $generation;
-                // $best_generation = $generation;
-                // $best_individual = $population[array_search($max_fitness, $fitness_values)];
-                // $best_individual_index = array_search($max_fitness, $fitness_values); // Simpan indeks individu terbaik
                 break;
             }
-
+    
             // Seleksi dan pembentukan populasi baru
             $new_population = [];
             while (count($new_population) < $population_size) {
                 $parent1 = $this->roulette_wheel_selection($population, $fitness_values);
                 $parent2 = $this->roulette_wheel_selection($population, $fitness_values);
                 list($child1, $child2) = $this->crossover($parent1, $parent2);
-
+    
                 $child1 = $this->mutate($child1, $ruangList, $waktuList, $dosenList);
                 $child2 = $this->mutate($child2, $ruangList, $waktuList, $dosenList);
-
+    
                 $new_population[] = $child1;
                 if (count($new_population) < $population_size) {
                     $new_population[] = $child2;
                 }
             }
-
+    
             $population = $new_population;
             $generation_reached = $generation; // Menyimpan generasi terakhir yang dicapai
         }
-
+    
         // Setelah algoritma selesai, hitung waktu eksekusi dan tampilkan hasilnya
         $time_end = microtime(true);
         $execution_time = $time_end - $time_start;
+    
         // Menghitung konflik dan menyimpan detailnya
         $conflict_result = $this->calculate_conflict($best_individual);
         
-        // Menampilkan hasil terbaik
-        echo "<pre style='color:black; font-size:0.8rem'>========== HASIL ALGORITMA GENETIKA ========== \n";
-        echo "\r\nFITNESS TERBAIK       : " . $best_fitness;
-        echo "\r\nGENERASI              : " . $best_generation;
-        echo "\r\nEXECUTION TIME        : " . $execution_time . " detik";
-        echo "\r\nMEMORY USAGE          : " . round(memory_get_usage() / 1024 / 1024, 2) . " MB";
-        echo "\r\nJUMLAH KONFLIK        : " . $conflict_result['conflict'];
-        echo "\r\nINDIVIDU TERBAIK      : \n";
+        // Menyimpan hasil terbaik dalam variabel
+        $debug_result = "<pre style='color:black; font-size:0.8rem'>========== HASIL ALGORITMA GENETIKA ========== \n";
+        $debug_result .= "\r\nFITNESS TERBAIK       : " . $best_fitness;
+        $debug_result .= "\r\nGENERASI              : " . $best_generation;
+        $debug_result .= "\r\nEXECUTION TIME        : " . $execution_time . " detik";
+        $debug_result .= "\r\nMEMORY USAGE          : " . round(memory_get_usage() / 1024 / 1024, 2) . " MB";
+        $debug_result .= "\r\nJUMLAH KONFLIK        : " . $conflict_result['conflict'];
+        $debug_result .= "\r\nINDIVIDU TERBAIK      : \n";
         
         foreach ($best_individual as $index => $schedule) {
-            $number = $index+=1;
-            echo "[{$number}][Kelas: {$schedule['kelas']['kode']}, Matkul: {$schedule['mata_kuliah']['kode']}, Ruang: {$schedule['ruangan']['kode']}, Waktu: ({$schedule['waktu_kuliah']['id']}) {$schedule['waktu_kuliah']['hari']}/{$schedule['waktu_kuliah']['jam']}, Dosen: {$schedule['dosen']['nama']}]\n";
-        }        
-
-        echo "<div class='notic'><strong>";
-        if ($best_fitness == 1) {
-            // Jika fitness terbaik adalah 1, berarti individu terbaik ditemukan
-            echo "\r\nPesan         : <span style='font-family-sans'>Individu terbaik berhasil ditemukan pada generasi ke-{$best_generation} dan individu ke-{$best_individual_index}!</span>";             
-        } else {
-            // Jika fitness terbaik belum mencapai 1, tampilkan informasi generasi dan individu terbaik
-            echo "\r\nPesan         : <span style='font-family-sans'>Individu terbaik ditemukan pada generasi ke-{$best_generation} dan individu ke-{$best_individual_index}, namun fitness belum mencapai 1.</span>";             
+            $number = $index + 1;
+            $debug_result .= "[{$number}][Kelas: {$schedule['kelas']['kode']}, Matkul: {$schedule['mata_kuliah']['kode']}, Ruang: {$schedule['ruangan']['kode']}, Waktu: ({$schedule['waktu_kuliah']['id']}) {$schedule['waktu_kuliah']['hari']}/{$schedule['waktu_kuliah']['jam']}, Dosen: {$schedule['dosen']['nama']}]\n";
         }
-        echo "</strong></div>\n<div>Melakukan looping generasi ke {$generation_reached} dari max generasi {$generations}</div></pre>";
-
-        echo "<br/>============ Konflik ============";
-        echo $conflict_result['debug_conflict']; // Menampilkan detail konflik
-
-        return $best_individual;
+    
+        $debug_result .= "<div class='notic'><strong>";
+        if ($best_fitness == 1) {
+            $debug_result .= "\r\nPesan         : <span style='font-family-sans'>Individu terbaik berhasil ditemukan pada generasi ke-{$best_generation} dan individu ke-{$best_individual_index}!</span>";
+        } else {
+            $debug_result .= "\r\nPesan         : <span style='font-family-sans'>Individu terbaik ditemukan pada generasi ke-{$best_generation} dan individu ke-{$best_individual_index}, namun fitness belum mencapai 1.</span>";
+        }
+        $debug_result .= "</strong></div>\n<div>Melakukan looping generasi ke {$generation_reached} dari max generasi {$max_generation}</div></pre>";
+    
+        // Menyiapkan array hasil
+        return [
+            'best_fitness' => $best_fitness,
+            'best_generation' => $best_generation,
+            'best_individual_index' => $best_individual_index,
+            'generation_reached' => $generation_reached,
+            'max_generation' => $max_generation,
+            'execution_time' => $execution_time,
+            'memory_usage' => round(memory_get_usage() / 1024 / 1024, 2) . ' MB',
+            'total_conflict' => $conflict_result['conflict'],
+            'debug_conflict' =>  $conflict_result['conflict'] !== 0 ? $conflict_result['debug_conflict'] : null,
+            'best_individual' => $best_individual,
+            'debug_result' => $debug_result,
+            'debug_generation' => $debug_generation
+        ];
     }
+    
 }

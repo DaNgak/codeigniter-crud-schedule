@@ -79,6 +79,14 @@
     <hr class="sidebar-divider">
 
     <!-- Nav Item - Waktu Kuliah -->
+    <li class="nav-item <?= (uri_string() == 'dashboard/periode-kuliah' || strpos(uri_string(), 'dashboard/periode-kuliah') === 0) ? 'active' : '' ?>">
+        <a class="nav-link" href="<?= site_url('/dashboard/periode-kuliah') ?>">
+            <i class="fas fa-fw fa-folder"></i>
+            <span>Periode Kuliah</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Waktu Kuliah -->
     <li class="nav-item <?= (uri_string() == 'dashboard/waktu-kuliah' || strpos(uri_string(), 'dashboard/waktu-kuliah') === 0) ? 'active' : '' ?>">
         <a class="nav-link" href="<?= site_url('/dashboard/waktu-kuliah') ?>">
             <i class="fas fa-fw fa-clock"></i>
@@ -90,7 +98,7 @@
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
             aria-expanded="true" aria-controls="collapsePages">
-            <i class="fas fa-fw fa-folder"></i>
+            <i class="fas fa-fw fa-calendar"></i>
             <span>Jadwal</span>
         </a>
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">

@@ -15,5 +15,6 @@ class DatabaseSeeder extends Seeder
         $this->call('DosenSeeder');
         $this->call('RuanganSeeder');
         $this->call('WaktuKuliahSeeder');
+        $this->call('PeriodeKuliahSeeder');
     }
 }

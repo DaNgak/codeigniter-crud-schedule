@@ -92,6 +92,7 @@ class Autoload extends AutoloadConfig
      */
     public $helpers = [
         'setting',
-        'flash_alert_helper'
+        'flash_alert_helper',
+        'custom_validation'
     ];
 }

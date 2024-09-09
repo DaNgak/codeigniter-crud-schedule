@@ -23,6 +23,7 @@
     <!-- Custom styles for this template-->
     <link href="<?= base_url('css/sb-admin-2.min.css') ?>" rel="stylesheet">
     <link href="<?= base_url('vendor/datatables/dataTables.bootstrap4.min.css') ?>" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
     
     <!-- Additional CSS -->
     <?= $this->renderSection('style') ?>
@@ -87,6 +88,7 @@
     <script src="<?= base_url('vendor/datatables/dataTables.bootstrap4.min.js') ?>"></script>
 
     <!-- Dependecies script -->
+    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Additional CSS -->
     <?= $this->renderSection('script') ?>

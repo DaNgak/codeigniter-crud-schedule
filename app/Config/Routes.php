@@ -82,6 +82,16 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
         $routes->delete('delete/(:num)', 'WaktuKuliahController::delete/$1');
     });
 
+    // Route untuk 'periode-kuliah'
+    $routes->group('periode-kuliah', function($routes) {
+        $routes->get('/', 'PeriodeKuliahController::index');
+        $routes->get('create', 'PeriodeKuliahController::create');
+        $routes->post('store', 'PeriodeKuliahController::store');
+        $routes->get('edit/(:num)', 'PeriodeKuliahController::edit/$1');
+        $routes->put('update/(:num)', 'PeriodeKuliahController::update/$1');
+        $routes->delete('delete/(:num)', 'PeriodeKuliahController::delete/$1');
+    });
+
     // Route untuk 'jadwal'
     $routes->group('jadwal', function($routes) {
         $routes->get('/', 'JadwalController::index');
