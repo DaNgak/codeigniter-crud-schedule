@@ -48,16 +48,17 @@ class JadwalModel extends Model
 
             $row['kelas'] = [
                 'id' => $row['kelas_id'],
-                'nama' => $row['kelas_name']
+                'nama' => $row['kelas_name'],
+                'kode' => $row['kelas_kode']
             ];
             unset($row['kelas_name']);
 
             $row['dosen'] = [
                 'id' => $row['dosen_id'],
                 'nama' => $row['dosen_name'],
-                'nomor_pegawai' => $row['dosen_nomor_pegawai']
+                'nomer_pegawai' => $row['dosen_nomer_pegawai']
             ];
-            unset($row['dosen_name'], $row['dosen_nomor_pegawai']);
+            unset($row['dosen_name'], $row['dosen_nomer_pegawai']);
 
             $row['waktu_kuliah'] = [
                 'id' => $row['waktu_kuliah_id'],
@@ -84,9 +85,9 @@ class JadwalModel extends Model
     {
         $result = $this->select('jadwal.*, program_studi.id as program_studi_id, program_studi.nama as program_studi_nama, program_studi.kode as program_studi_kode, 
             mata_kuliah.id as mata_kuliah_id, mata_kuliah.nama as mata_kuliah_name, mata_kuliah.kode as mata_kuliah_kode, 
-            kelas.id as kelas_id, kelas.nama as kelas_name, 
+            kelas.id as kelas_id, kelas.nama as kelas_name, kelas.kode as kelas_kode, 
             ruangan.id as ruangan_id, ruangan.nama as ruangan_name, ruangan.kode as ruangan_kode, 
-            dosen.id as dosen_id, dosen.nama as dosen_name, dosen.nomor_pegawai as dosen_nomor_pegawai, 
+            dosen.id as dosen_id, dosen.nama as dosen_name, dosen.nomer_pegawai as dosen_nomer_pegawai, 
             waktu_kuliah.id as waktu_kuliah_id, waktu_kuliah.hari as waktu_kuliah_hari, waktu_kuliah.jam_mulai as waktu_kuliah_jam_mulai, waktu_kuliah.jam_selesai as waktu_kuliah_jam_selesai, 
             periode_kuliah.id as periode_kuliah_id, periode_kuliah.tahun_awal as periode_kuliah_tahun_awal, periode_kuliah.tahun_akhir as periode_kuliah_tahun_akhir, periode_kuliah.semester as periode_kuliah_semester')
             ->join('program_studi', 'program_studi.id = jadwal.program_studi_id', 'left')
@@ -107,9 +108,9 @@ class JadwalModel extends Model
     {
         $result = $this->select('jadwal.*, program_studi.id as program_studi_id, program_studi.nama as program_studi_nama, program_studi.kode as program_studi_kode, 
             mata_kuliah.id as mata_kuliah_id, mata_kuliah.nama as mata_kuliah_name, mata_kuliah.kode as mata_kuliah_kode, 
-            kelas.id as kelas_id, kelas.nama as kelas_name, 
+            kelas.id as kelas_id, kelas.nama as kelas_name, kelas.kode as kelas_kode, 
             ruangan.id as ruangan_id, ruangan.nama as ruangan_name, ruangan.kode as ruangan_kode, 
-            dosen.id as dosen_id, dosen.nama as dosen_name, dosen.nomor_pegawai as dosen_nomor_pegawai, 
+            dosen.id as dosen_id, dosen.nama as dosen_name, dosen.nomer_pegawai as dosen_nomer_pegawai, 
             waktu_kuliah.id as waktu_kuliah_id, waktu_kuliah.hari as waktu_kuliah_hari, waktu_kuliah.jam_mulai as waktu_kuliah_jam_mulai, waktu_kuliah.jam_selesai as waktu_kuliah_jam_selesai, 
             periode_kuliah.id as periode_kuliah_id, periode_kuliah.tahun_awal as periode_kuliah_tahun_awal, periode_kuliah.tahun_akhir as periode_kuliah_tahun_akhir, periode_kuliah.semester as periode_kuliah_semester')
             ->join('program_studi', 'program_studi.id = jadwal.program_studi_id', 'left')
@@ -131,9 +132,9 @@ class JadwalModel extends Model
     {
         $result = $this->select('jadwal.*, program_studi.id as program_studi_id, program_studi.nama as program_studi_nama, program_studi.kode as program_studi_kode, 
             mata_kuliah.id as mata_kuliah_id, mata_kuliah.nama as mata_kuliah_name, mata_kuliah.kode as mata_kuliah_kode, 
-            kelas.id as kelas_id, kelas.nama as kelas_name, 
+            kelas.id as kelas_id, kelas.nama as kelas_name, kelas.kode as kelas_kode,  
             ruangan.id as ruangan_id, ruangan.nama as ruangan_name, ruangan.kode as ruangan_kode, 
-            dosen.id as dosen_id, dosen.nama as dosen_name, dosen.nomor_pegawai as dosen_nomor_pegawai, 
+            dosen.id as dosen_id, dosen.nama as dosen_name, dosen.nomer_pegawai as dosen_nomer_pegawai, 
             waktu_kuliah.id as waktu_kuliah_id, waktu_kuliah.hari as waktu_kuliah_hari, waktu_kuliah.jam_mulai as waktu_kuliah_jam_mulai, waktu_kuliah.jam_selesai as waktu_kuliah_jam_selesai, 
             periode_kuliah.id as periode_kuliah_id, periode_kuliah.tahun_awal as periode_kuliah_tahun_awal, periode_kuliah.tahun_akhir as periode_kuliah_tahun_akhir, periode_kuliah.semester as periode_kuliah_semester')
             ->join('program_studi', 'program_studi.id = jadwal.program_studi_id', 'left')

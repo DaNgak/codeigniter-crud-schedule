@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/app') ?>
 
 <?= $this->section('title') ?>
-    Buat Jadwal
+    Generate Jadwal
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -10,7 +10,7 @@
     <div class="col-12">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Buat Jadwal</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Generate Jadwal</h6>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -33,7 +33,7 @@
                             <select name="tahun_ajaran" id="tahun_ajaran" class="form-control">
                                 <option value="">--- Pilih Tahun Ajaran ---</option>
                                 <?php foreach ($tahunAjaran as $tahun): ?>
-                                    <option value="<?= esc($tahun['id']) ?>"><?= esc($tahun['periode']) ?> - <?= esc($tahun['semester']) ?></option>
+                                    <option value="<?= esc($tahun['id']) ?>"><?= esc($tahun['tahun_awal']) ?>/<?= esc($tahun['tahun_akhir']) ?> - <?= esc($tahun['semester']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -71,8 +71,6 @@
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Isi modal evaluasi jadwal -->
-                Evaluasi Jadwal akan dilakukan di sini.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -94,7 +92,7 @@
             </div>
             <div class="modal-body">
                 <!-- Isi modal perhitungan generate -->
-                Perhitungan Generate akan dilakukan di sini.
+                <!-- Perhitungan Generate akan dilakukan di sini. -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -107,6 +105,10 @@
 
 <?= $this->section('script') ?>
 <script>
+    // Declare global variables
+    let bestIndividual = null;
+    let totalConflict = null;
+
     $(document).ready(function() {
         $('#generateBtn').click(function() {
             const prodi = $('#prodi').val();
@@ -149,7 +151,8 @@
                             }).then(() => {
                                 // Prepare explanation and table content
                                 const data = response.data;
-                                const bestIndividual = data.best_individual;
+                                bestIndividual = data.best_individual;
+                                totalConflict = data.total_conflict;
                                 
                                 // Construct the explanation
                                 let explanation = `
@@ -162,7 +165,8 @@
                                     <p class='m-0'>Catatan :</p>
                                     <p class='m-0 ${data.total_conflict > 0 ? 'text-danger' : ''}'>
                                         ${data.total_conflict > 0 
-                                            && `Terdapat konflik total ${data.total_conflict}, Anda dapat memperbaiki pada tombol <strong>"Evaluasi Jadwal"</strong> atau melakukan generate ulang dengan klik tombol <strong>"Generate Jadwal"</strong> sampai tidak ada konflik pada saat melakukan generate jadwal`
+                                            ? `Terdapat konflik total ${data.total_conflict}, Anda dapat memperbaiki pada tombol <strong>"Evaluasi Jadwal"</strong> atau melakukan generate ulang dengan klik tombol <strong>"Generate Jadwal"</strong> sampai tidak ada konflik pada saat melakukan generate jadwal`
+                                            : ''
                                         }
                                     </p>
                                     <p class='m-0'>Individu terbaik berhasil ditemukan pada generasi ke-${data.best_generation} dan individu ke-${data.best_individual_index}!</p>
@@ -190,7 +194,8 @@
                                 // Display the explanation, save button, and table
                                 $('#containerResult').html(`
                                     ${explanation}
-                                    <button type="button" id="saveJadwalBtn" class="btn btn-primary my-3">Simpan Data Jadwal</button>
+                                    <button type="button" id="saveJadwalBtn" class="btn btn-primary my-3" ${data.total_conflict > 0 ? 'text-danger' : ''}'
+                                        ${data.total_conflict > 0  ? 'disabled' : ''}>Simpan Data Jadwal</button>
                                     ${tableHTML}
                                 `);
 
@@ -201,6 +206,8 @@
                                 const debugConflict = response.data.debug_conflict;
                                 if (debugConflict) {
                                     $('#evaluasiModal .modal-body').html(debugConflict);
+                                } else {
+                                    $('#evaluasiModal .modal-body').html('Tidak ada konflik karena total konflik ' + data.total_conflict);
                                 }
 
                                 // Check if debug_result exists, then display it in the modal
@@ -267,6 +274,102 @@
                     }
                 });
             }
+        });
+
+        // Event for Save Schedule button
+        $('#containerResult').on('click', '#saveJadwalBtn', function() {
+            const prodi = $('#prodi').val();
+            const tahunAjaran = $('#tahun_ajaran').val();
+
+            // Check if the schedule data exists
+            if (!bestIndividual || totalConflict === null) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Perhatian',
+                    text: 'Harap melakukan generate jadwal terlebih dahulu!',
+                });
+                return;
+            }
+
+            // Check for conflicts
+            if (totalConflict > 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Konflik Jadwal',
+                    text: 'Terdapat konflik pada jadwal. Silahkan perbaiki di evaluasi jadwal atau generate ulang hingga konflik menjadi 0.',
+                });
+                return;
+            }
+
+            // Confirm save action
+            Swal.fire({
+                title: 'Konfirmasi Simpan',
+                text: 'Apakah Anda yakin ingin menyimpan jadwal ini?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Prepare schedule data
+                    let jadwal = bestIndividual.map((item) => {
+                        return {
+                            kelas: item.kelas.id,
+                            mata_kuliah: item.mata_kuliah.id,
+                            ruangan: item.ruangan.id,
+                            waktu_kuliah: item.waktu_kuliah.id,
+                            dosen: item.dosen.id,
+                        };
+                    });
+
+                    // Send AJAX request to save schedule
+                    $.ajax({
+                        url: '<?= site_url("/dashboard/jadwal/generate/store") ?>',
+                        type: 'POST',
+                        data: { 
+                            jadwal: jadwal,
+                            program_studi_id: prodi,
+                            tahun_ajaran_id: tahunAjaran
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Sukses',
+                                text: 'Jadwal berhasil disimpan!',
+                                icon: 'success'
+                            });
+                        },
+                        error: function(xhr) {
+                            const response = xhr.responseJSON;
+                            
+                            if (xhr.status === 400) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Failed',
+                                    text: response.message || 'Data yang dikirim tidak valid atau ada yang kosong.',
+                                });
+                            } else if (xhr.status === 422) {
+                                let errorList = '<ul>';
+                                $.each(response.errors, function(key, value) {
+                                    errorList += '<li>' + value + '</li>';
+                                });
+                                errorList += '</ul>';
+
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Kesalahan Validasi',
+                                    html: errorList,
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'Terjadi kesalahan, silahkan coba lagi.',
+                                    icon: 'error',
+                                });
+                            }
+                        }
+                    });
+                }
+            });
         });
     });
 </script>

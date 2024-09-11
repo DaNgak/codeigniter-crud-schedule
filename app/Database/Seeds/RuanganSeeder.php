@@ -72,6 +72,13 @@ class RuanganSeeder extends Seeder
                 'keterangan' => 'Ruang kelas untuk Teknik Informatika',
                 'kapasitas' => 55,
             ],
+            [
+                'program_studi_id' => 1,
+                'nama' => 'TI-Ruang 10',
+                'kode' => 'TIR10',
+                'keterangan' => 'Ruang kelas untuk Teknik Informatika',
+                'kapasitas' => 30,
+            ],
         ];
 
         // Insert data ke dalam tabel 'ruangan'

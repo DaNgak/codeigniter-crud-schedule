@@ -1,14 +1,21 @@
 <?= $this->extend('layouts/app') ?>
 
 <?= $this->section('title') ?>
-    Periode Kuliah
+    Jadwal
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Periode Kuliah</h1>
-    <a href="<?= site_url('/dashboard/periode-kuliah/create') ?>" class="d-flex align-items-center btn btn-sm btn-primary shadow-sm"><span class="mr-2 m-0" style="font-size: 18px !important;">+</span> Tambah Data</a>
+    <h1 class="h3 mb-0 text-gray-800">Jadwal</h1>
+    <div class="d-flex align-items-center">
+        <a href="<?= site_url('/dashboard/jadwal/generate') ?>" class="d-flex align-items-center btn btn-sm btn-info shadow-sm mr-3">
+            <span class="mr-2 m-0" style="font-size: 18px !important;">+</span> Generate Jadwal
+        </a>
+        <a href="<?= site_url('/dashboard/jadwal/create') ?>" class="d-flex align-items-center btn btn-sm btn-primary shadow-sm">
+            <span class="mr-2 m-0" style="font-size: 18px !important;">+</span> Tambah Jadwal
+        </a>
+    </div>
 </div>
 
 <!-- Content Row -->
@@ -16,31 +23,36 @@
     <div class="col-lg-12">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Tabel Periode Kuliah</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Tabel Jadwal</h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable-id" width="100%" cellspacing="0">
-                    <thead>
+                        <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Periode</th>
-                                <th>Semester</th>
+                                <th>Prodi</th>
+                                <th>Matkul</th>
+                                <th>Kelas</th>
+                                <th>Ruangan</th>
+                                <th>Dosen</th>
+                                <th>Waktu</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $no = 1; ?>
-                            <?php foreach ($periodeKuliah as $item): ?>
+                            <?php foreach ($jadwal as $item): ?>
                             <tr>
-                                <td><?= esc($no++) ?></td>
-                                <td><?= esc($item['tahun_awal']) ?>/<?= esc($item['tahun_akhir']) ?></td>
-                                <td><?= esc($item['semester']) ?></td>
+                                <td><?= esc($item['program_studi']['kode']) ?></td>
+                                <td>(<?= esc($item['mata_kuliah']['kode']) ?>)<?= esc($item['mata_kuliah']['nama']) ?></td>
+                                <td><?= esc($item['kelas']['kode']) ?></td>
+                                <td><?= esc($item['ruangan']['kode']) ?></td>
+                                <td>(<?= esc($item['dosen']['nomer_pegawai']) ?>)<br/><?= esc($item['dosen']['nama']) ?></td>
+                                <td><?= esc($item['waktu_kuliah']['hari']) ?><br/><?= date('H:i', strtotime(esc($item['waktu_kuliah']['jam_mulai']))) ?> - <?= date('H:i', strtotime(esc($item['waktu_kuliah']['jam_selesai']))) ?></td>
                                 <td>
-                                    <a href="<?= site_url('/dashboard/periode-kuliah/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm px-3">
+                                    <a href="<?= site_url('/dashboard/jadwal/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm px-3">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button" class="btn btn-danger btn-sm px-3 btn-delete" data-url="<?= site_url('/dashboard/periode-kuliah/delete/' . $item['id']) ?>" data-id="<?= esc($item['id']) ?>">
+                                    <button type="button" class="btn btn-danger btn-sm px-3 btn-delete" data-url="<?= site_url('/dashboard/jadwal/delete/' . $item['id']) ?>" data-id="<?= esc($item['id']) ?>">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -120,3 +132,4 @@
         });
     </script>
 <?= $this->endSection() ?>
+

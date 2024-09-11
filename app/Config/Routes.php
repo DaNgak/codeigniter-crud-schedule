@@ -96,11 +96,15 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     $routes->group('jadwal', function($routes) {
         $routes->get('/', 'JadwalController::index');
         $routes->get('create', 'JadwalController::create');
-        $routes->post('generate', 'JadwalController::generate');
         $routes->post('store', 'JadwalController::store');
         $routes->get('edit/(:num)', 'JadwalController::edit/$1');
         $routes->put('update/(:num)', 'JadwalController::update/$1');
         $routes->delete('delete/(:num)', 'JadwalController::delete/$1');
+
+        // Generate Jadwal
+        $routes->get('generate', 'JadwalController::generateView');
+        $routes->post('generate', 'JadwalController::generate');
+        $routes->post('generate/store', 'JadwalController::generateStore');
     });
 });
 

@@ -426,7 +426,7 @@ class GeneticAlgorithmService
     // }
 
     // Menjalankan algoritma genetika (api)
-    function genetic_algorithm($kelasList, $matkulList, $ruangList, $waktuList, $dosenList, $population_size, $max_generation) {
+    function execute($kelasList, $matkulList, $ruangList, $waktuList, $dosenList, $population_size, $max_generation) {
         $time_start = microtime(true); // Mulai waktu eksekusi
         $population = $this->create_population($population_size, $kelasList, $matkulList, $ruangList, $waktuList, $dosenList);
         $best_fitness = 0;
