@@ -1,21 +1,14 @@
 <?= $this->extend('layouts/app') ?>
 
 <?= $this->section('title') ?>
-    Jadwal
+    Mahasiswa
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Jadwal</h1>
-    <div class="d-flex align-items-center">
-        <a href="<?= site_url('/dashboard/jadwal/generate') ?>" class="d-flex align-items-center btn btn-sm btn-info shadow-sm mr-3">
-            <span class="mr-2 m-0" style="font-size: 18px !important;">+</span> Generate Jadwal
-        </a>
-        <a href="<?= site_url('/dashboard/jadwal/create') ?>" class="d-flex align-items-center btn btn-sm btn-primary shadow-sm">
-            <span class="mr-2 m-0" style="font-size: 18px !important;">+</span> Tambah Jadwal
-        </a>
-    </div>
+    <h1 class="h3 mb-0 text-gray-800">Mahasiswa</h1>
+    <a href="<?= site_url('/dashboard/mahasiswa/create') ?>" class="d-flex align-items-center btn btn-sm btn-primary shadow-sm"><span class="mr-2 m-0" style="font-size: 18px !important;">+</span> Tambah Data</a>
 </div>
 
 <!-- Content Row -->
@@ -23,36 +16,32 @@
     <div class="col-lg-12">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Tabel Jadwal</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Tabel Mahasiswa</h6>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered" id="dataTable-id" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th>Prodi/Periode</th>
-                                <th>Matkul</th>
+                                <th>Nama</th>
+                                <th>Nomer Identitas</th>
+                                <th>Program Studi</th>
                                 <th>Kelas</th>
-                                <th>Ruangan</th>
-                                <th>Dosen</th>
-                                <th>Waktu</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($jadwal as $item): ?>
+                            <?php foreach ($mahasiswa as $item): ?>
                             <tr>
-                                <td class="text-center align-middle"><?= esc($item['program_studi']['kode']) ?><br/><?= esc($item['periode_kuliah']['tahun_awal']) ?> / <?= esc($item['periode_kuliah']['tahun_akhir']) ?><br/>(<?= esc($item['periode_kuliah']['semester']) ?>) </td>
-                                <td class="text-center align-middle">(<?= esc($item['mata_kuliah']['kode']) ?>)<br/><?= esc($item['mata_kuliah']['nama']) ?></td>
-                                <td class="text-center align-middle"><?= esc($item['kelas']['kode']) ?></td>
-                                <td class="text-center align-middle"><?= esc($item['ruangan']['kode']) ?></td>
-                                <td class="text-center align-middle">(<?= esc($item['dosen']['nomer_pegawai']) ?>)<br/><?= esc($item['dosen']['nama']) ?></td>
-                                <td class="text-center align-middle"><?= esc($item['waktu_kuliah']['hari']) ?><br/><?= date('H:i', strtotime(esc($item['waktu_kuliah']['jam_mulai']))) ?> - <?= date('H:i', strtotime(esc($item['waktu_kuliah']['jam_selesai']))) ?></td>
+                                <td class="text-center align-middle"><?= esc($item['nama']) ?></td>
+                                <td class="text-center align-middle"><?= esc($item['nomer_identitas']) ?></td>
+                                <td class="text-center align-middle">(<?= esc($item['program_studi']['kode']) ?>)<br/><?= esc($item['program_studi']['nama']) ?></td>
+                                <td class="text-center align-middle">(<?= esc($item['kelas']['kode']) ?>)<br/><?= esc($item['kelas']['nama']) ?></td>
                                 <td class="text-center align-middle">
-                                    <a href="<?= site_url('/dashboard/jadwal/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm px-3">
+                                    <a href="<?= site_url('/dashboard/mahasiswa/edit/' . $item['id']) ?>" class="btn btn-warning btn-sm px-3">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button" class="btn btn-danger btn-sm px-3 btn-delete" data-url="<?= site_url('/dashboard/jadwal/delete/' . $item['id']) ?>" data-id="<?= esc($item['id']) ?>">
+                                    <button type="button" class="btn btn-danger btn-sm px-3 btn-delete" data-url="<?= site_url('/dashboard/mahasiswa/delete/' . $item['id']) ?>" data-id="<?= esc($item['id']) ?>">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -66,6 +55,7 @@
     </div>
 </div>
 <?= $this->endSection() ?>
+
 
 <?= $this->section('script') ?>
     <!-- Sweet Alert Session Flash Script -->
@@ -132,4 +122,3 @@
         });
     </script>
 <?= $this->endSection() ?>
-

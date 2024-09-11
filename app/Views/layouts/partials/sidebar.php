@@ -103,7 +103,7 @@
         </a>
         <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="<?= site_url('/dashboard/jadwal/create') ?>">Buat Jadwal</a>
+                <a class="collapse-item" href="<?= site_url('/dashboard/jadwal/generate') ?>">Generate Jadwal</a>
                 <a class="collapse-item" href="<?= site_url('/dashboard/jadwal') ?>">Kelola Jadwal</a>
             </div>
         </div>

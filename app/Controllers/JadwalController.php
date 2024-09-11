@@ -347,8 +347,11 @@ class JadwalController extends BaseController
     
         return $this->response->setStatusCode(200)
             ->setJSON([
-                'code' => 200, 
-                'message' => 'Data Jadwal berhasil disimpan. Total data : ' . count($dataBatch),
+                'code' => 200,
+                'message' => [
+                    'title' => 'Success',
+                    'description' => 'Data Jadwal berhasil disimpan. Total data : ' . count($dataBatch),
+                ], 
                 'data' => $dataBatch
             ]);
     }

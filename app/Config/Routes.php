@@ -72,6 +72,19 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
         $routes->delete('delete/(:num)', 'KelasController::delete/$1');
     });
 
+    // Route untuk 'mahasiswa'
+    $routes->group('mahasiswa', function($routes) {
+        $routes->get('/', 'MahasiswaController::index');
+        $routes->get('create', 'MahasiswaController::create');
+        $routes->post('store', 'MahasiswaController::store');
+        $routes->get('edit/(:num)', 'MahasiswaController::edit/$1');
+        $routes->put('update/(:num)', 'MahasiswaController::update/$1');
+        $routes->delete('delete/(:num)', 'MahasiswaController::delete/$1');
+
+        // Route untuk dropdown
+        $routes->get('dropdown/getKelasByProgramStudi/(:num)', 'MahasiswaController::getKelasByProgramStudi/$1');
+    });
+
     // Route untuk 'waktu-kuliah'
     $routes->group('waktu-kuliah', function($routes) {
         $routes->get('/', 'WaktuKuliahController::index');

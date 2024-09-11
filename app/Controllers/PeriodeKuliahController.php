@@ -155,12 +155,6 @@ class PeriodeKuliahController extends BaseController
     {
         $session = session();
 
-        // Ambil data yang ada
-        $existingData = $this->periodeKuliahModel->find($id);
-        if (!$existingData) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Periode kuliah tidak ditemukan');
-        }
-
         // Validasi input
         $validation = \Config\Services::validation();
         $validation->setRules([
@@ -186,7 +180,7 @@ class PeriodeKuliahController extends BaseController
                 ],
             ],
         ]);
-
+    
         if (!$validation->withRequest($this->request)->run()) {
             $errors = $validation->getErrors();
             $errorList = '<ul>';
@@ -194,31 +188,78 @@ class PeriodeKuliahController extends BaseController
                 $errorList .= '<li>' . esc($error) . '</li>';
             }
             $errorList .= '</ul>';
-
+    
             $session->setFlashdata('message', [
                 'title' => 'Validation Error',
                 'description' => $errorList,
                 'type' => 'danger'
             ]);
-
-            return redirect()->to('/dashboard/periode-kuliah/edit/' . $id)->withInput();
+    
+            return redirect()->to('/dashboard/periode-kuliah/edit/'.$id)->withInput();
         }
-
+    
+        $tahunAwal = $this->request->getPost('tahun_awal');
+        $tahunAkhir = $this->request->getPost('tahun_akhir');
+        $semester = $this->request->getPost('semester');
+    
+        // Manual validation for tahun_akhir
+        if ($tahunAkhir <= $tahunAwal) {
+            $session->setFlashdata('message', [
+                'title' => 'Validation Error',
+                'description' => '<ul><li>Tahun akhir harus lebih besar dari tahun awal.</li></ul>',
+                'type' => 'danger'
+            ]);
+    
+            return redirect()->to('/dashboard/periode-kuliah/edit/'.$id)->withInput();
+        }
+    
+        if ($tahunAkhir != $tahunAwal + 1) {
+            $session->setFlashdata('message', [
+                'title' => 'Validation Error',
+                'description' => '<ul><li>Tahun akhir harus tepat satu tahun lebih besar dari tahun awal.</li></ul>',
+                'type' => 'danger'
+            ]);
+    
+            return redirect()->to('/dashboard/periode-kuliah/edit/'.$id)->withInput();
+        }
+    
+        // Check if the data already exists
+        $existing = $this->periodeKuliahModel->where([
+            'tahun_awal' => $tahunAwal,
+            'tahun_akhir' => $tahunAkhir,
+            'semester' => $semester,
+            'id !=' => $id, // Exclude current record from the check
+        ])->first();
+    
+        if ($existing) {
+            $errorList = '<ul>';
+            $errorList .= '<li>Data ini sudah ada di database. Harap input data lainnya.</li>';
+            $errorList .= '</ul>';
+    
+            $session->setFlashdata('message', [
+                'title' => 'Validation Error',
+                'description' => $errorList,
+                'type' => 'danger'
+            ]);
+    
+            return redirect()->to('/dashboard/periode-kuliah/edit/'.$id)->withInput();
+        }
+    
+        // Update the data
         $data = [
-            'id' => $id,
-            'tahun_awal' => $this->request->getPost('tahun_awal'),
-            'tahun_akhir' => $this->request->getPost('tahun_akhir'),
-            'semester' => $this->request->getPost('semester'),
+            'tahun_awal' => $tahunAwal,
+            'tahun_akhir' => $tahunAkhir,
+            'semester' => $semester,
         ];
-
-        $this->periodeKuliahModel->save($data);
-
+    
+        $this->periodeKuliahModel->update($id, $data);
+    
         $session->setFlashdata('message', [
             'title' => 'Success',
-            'description' => 'Periode kuliah berhasil diperbarui.',
+            'description' => 'Periode kuliah berhasil diupdate.',
             'type' => 'success'
         ]);
-
+    
         return redirect()->to('/dashboard/periode-kuliah');
     }
 

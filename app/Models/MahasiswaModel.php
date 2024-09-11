@@ -53,7 +53,7 @@ class MahasiswaModel extends Model
     // Method untuk join dengan program studi dan kelas, membentuk array bersarang
     public function findAllWithAllRelation()
     {
-        $result = $this->select('mahasiswa.*, program_studi.nama as program_studi_nama, kelas.nama as kelas_nama, kelas.kode as kelas_kode')
+        $result = $this->select('mahasiswa.*, program_studi.nama as program_studi_nama, program_studi.kode as program_studi_kode, kelas.nama as kelas_nama, kelas.kode as kelas_kode')
             ->join('program_studi', 'program_studi.id = mahasiswa.program_studi_id', 'left')
             ->join('kelas', 'kelas.id = mahasiswa.kelas_id', 'left')
             ->get()
@@ -63,9 +63,10 @@ class MahasiswaModel extends Model
         foreach ($result as &$row) {
             // Array bersarang untuk program_studi
             $row['program_studi'] = [
-                'nama' => $row['program_studi_nama']
+                'nama' => $row['program_studi_nama'],
+                'kode' => $row['program_studi_kode']
             ];
-            unset($row['program_studi_nama']);  // Hapus alias yang tidak diperlukan
+            unset($row['program_studi_nama'], $row['program_studi_kode']);  // Hapus alias yang tidak diperlukan
 
             // Array bersarang untuk kelas
             $row['kelas'] = [

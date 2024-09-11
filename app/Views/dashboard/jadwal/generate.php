@@ -332,11 +332,21 @@
                             tahun_ajaran_id: tahunAjaran
                         },
                         success: function(response) {
-                            Swal.fire({
-                                title: 'Sukses',
-                                text: 'Jadwal berhasil disimpan!',
-                                icon: 'success'
-                            });
+                            if (response.code === 200) {
+                                Swal.fire({
+                                    title: response.message.title,
+                                    text: response.message.description,
+                                    icon: response.message.type || 'success',
+                                }).then(() => {
+                                    window.location.href = "<?= site_url('/dashboard/jadwal') ?>";
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Failed',
+                                    text: 'Gagal melakukan aksi, silahkan coba lagi.',
+                                    icon: 'warning',
+                                });
+                            }
                         },
                         error: function(xhr) {
                             const response = xhr.responseJSON;
