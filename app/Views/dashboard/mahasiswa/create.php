@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/app') ?>
 
 <?= $this->section('title') ?>
-    Tambah Mahasiswa
+    Mahasiswa
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>

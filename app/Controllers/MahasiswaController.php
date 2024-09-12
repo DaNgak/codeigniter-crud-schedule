@@ -101,7 +101,6 @@ class MahasiswaController extends BaseController
         return redirect()->to('/dashboard/mahasiswa');
     }
 
-
     public function edit($id)
     {
         $existingData = $this->mahasiswaModel->find($id);
@@ -231,11 +230,27 @@ class MahasiswaController extends BaseController
     // Dropdown 
     public function getKelasByProgramStudi($programStudiId)
     {
-        $kelas = $this->kelasModel->where('program_studi_id', $programStudiId)->findAll();
-        return $this->response->setJSON([
-            'code' => 200,
-            'message' => 'Success',
-            'data' => $kelas
-        ]);
+        try {
+            // Attempt to retrieve kelas data based on program_studi_id
+            $kelas = $this->kelasModel->where('program_studi_id', $programStudiId)->findAll();
+    
+            // Return success response
+            return $this->response->setJSON([
+                'code' => 200,
+                'message' => 'Success',
+                'data' => $kelas
+            ]);
+        } catch (\Exception $e) {
+            // Return error response 
+            return $this->response->setJSON([
+                'code' => 500,
+                'message' => [
+                    'title' => 'Error',
+                    'description' => $e->getMessage(),
+                    'type' => 'error'
+                ],
+                'data' => null
+            ])->setStatusCode(500);
+        }
     }
 }
