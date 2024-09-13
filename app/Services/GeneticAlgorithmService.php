@@ -278,6 +278,7 @@ class GeneticAlgorithmService
         $ruangan_with_time_map = [];
         $dosen_with_time_map = [];
         $conflict_details = [];
+        $conflict_index = [];
         foreach ($individual as $index => $schedule) {
             // Create unique keys for room-time and instructor-time conflicts
             $ruangan_time_key = "{$schedule['ruangan']['kode']}-{$schedule['waktu_kuliah']['hari']}-{$schedule['waktu_kuliah']['jam']}";
@@ -295,7 +296,10 @@ class GeneticAlgorithmService
                 $conflict_details[] = "Konflik Ruangan: Baris " . ($index + 1) . " dan Baris " . ($ruangan_with_time_map[$ruangan_time_key] + 1);
                 $conflict_details[] = "Data 1: " . $formatted_data($individual[$index]);
                 $conflict_details[] = "Data 2: " . $formatted_data($individual[$ruangan_with_time_map[$ruangan_time_key]]);
-                $conflict_details[] = ""; // Add empty line as a separator
+                $conflict_details[] = "==================="; // Add empty line as a separator
+
+                // Store the conflicting indices (original indices without +1)
+                $conflict_index[] = [$index, $ruangan_with_time_map[$ruangan_time_key]];
             } else {
                 // No conflict, store this room-time pairing
                 $ruangan_with_time_map[$ruangan_time_key] = $index;
@@ -308,7 +312,10 @@ class GeneticAlgorithmService
                 $conflict_details[] = "Konflik Dosen: Baris " . ($index + 1) . " dan Baris " . ($dosen_with_time_map[$dosen_time_key] + 1);
                 $conflict_details[] = "Data 1: " . $formatted_data($individual[$index]);
                 $conflict_details[] = "Data 2: " . $formatted_data($individual[$dosen_with_time_map[$dosen_time_key]]);
-                $conflict_details[] = ""; // Add empty line as a separator
+                $conflict_details[] = "==================="; // Add empty line as a separator
+
+                // Store the conflicting indices (original indices without +1)
+                $conflict_index[] = [$index, $dosen_with_time_map[$dosen_time_key]];
             } else {
                 // No conflict, store this instructor-time pairing
                 $dosen_with_time_map[$dosen_time_key] = $index;
@@ -320,7 +327,8 @@ class GeneticAlgorithmService
     
         return [
             'conflict' => $conflicts,
-            'debug_conflict' => $console
+            'debug_conflict' => $console,
+            'conflict_index' => $conflict_index
         ];
     }
 
@@ -529,8 +537,9 @@ class GeneticAlgorithmService
             'total_conflict' => $conflict_result['conflict'],
             'debug_conflict' =>  $conflict_result['conflict'] !== 0 ? $conflict_result['debug_conflict'] : null,
             'best_individual' => $best_individual,
+            'conflict_index' => $conflict_result['conflict_index'],
             'debug_result' => $debug_result,
-            'debug_generation' => $debug_generation
+            'debug_generation' => $debug_generation,
         ];
     }
     

@@ -71,6 +71,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                <!-- Isi modal evaluasi jadwal -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -101,6 +102,28 @@
         </div>
     </div>
 </div>
+
+<!-- Modal fixing Evaluasi Jadwal -->
+<div class="modal fade" id="bestIndividualModal" role="dialog" tabindex="-1" aria-labelledby="bestIndividualModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bestIndividualModalLabel">Edit Baris Data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Dynamic content will be injected here -->
+                <!-- Buatkan select dropdown untuk menampilkan data yang dari masing-masing prodi -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
@@ -110,6 +133,26 @@
     let totalConflict = null;
 
     $(document).ready(function() {
+        // Event handler for conflict buttons
+        $(document).on('click', '.conflict-btn', function() {
+            console.log("test")
+            const bestIndex = $(this).data('index');
+            const individual = bestIndividual[bestIndex];
+
+            // Construct the modal content with individual data
+            let modalContent = `
+                <p><strong>Kelas:</strong> ${individual.kelas.nama} - ${individual.kelas.kode}</p>
+                <p><strong>Mata Kuliah:</strong> ${individual.mata_kuliah.nama} - ${individual.mata_kuliah.kode}</p>
+                <p><strong>Ruangan:</strong> ${individual.ruangan.nama} - ${individual.ruangan.kode}</p>
+                <p><strong>Waktu Kuliah:</strong> ${individual.waktu_kuliah.id} ${individual.waktu_kuliah.hari} (${individual.waktu_kuliah.jam_mulai} - ${individual.waktu_kuliah.jam_selesai})</p>
+                <p><strong>Dosen:</strong> ${individual.dosen.id} ${individual.dosen.nama}</p>
+            `;
+
+            // Set the content to the modal body
+            $('#bestIndividualModal .modal-body').html(modalContent);
+            $('#bestIndividualModal').modal('show');
+        });
+
         $('#generateBtn').click(function() {
             const prodi = $('#prodi').val();
             const tahunAjaran = $('#tahun_ajaran').val();
@@ -205,7 +248,27 @@
                                 // Check if debug_conflict exists, then display it in the modal
                                 const debugConflict = response.data.debug_conflict;
                                 if (debugConflict) {
-                                    $('#evaluasiModal .modal-body').html(debugConflict);
+                                    let conflictButtonsHTML = '';
+                                    // Loop through conflict_index and generate buttons
+                                    if (data.conflict_index && data.conflict_index.length > 0) {
+                                        $.each(data.conflict_index, function(loopIndex, conflictPair) {
+                                            const index1 = conflictPair[0] + 1; // Adjust index to human-readable (1-based)
+                                            const index2 = conflictPair[1] + 1;
+
+                                            conflictButtonsHTML += `
+                                                <br/>
+                                                <h5 class="fs-5 fw-medium mb-0">Konflik ke-${loopIndex + 1}</h5>
+                                                <button type="button" class="btn btn-info conflict-btn me-3" data-index="${conflictPair[0]}" data-bs-toggle="modal" data-bs-target="#bestIndividualModal">
+                                                    Data baris ke-${index1}
+                                                </button>
+                                                <button type="button" class="btn btn-info conflict-btn" data-index="${conflictPair[1]}" data-bs-toggle="modal" data-bs-target="#bestIndividualModal">
+                                                    Data baris ke-${index2}
+                                                </button>
+                                                <br/>
+                                            `;
+                                        });
+                                    }
+                                    $('#evaluasiModal .modal-body').html(debugConflict + conflictButtonsHTML);
                                 } else {
                                     $('#evaluasiModal .modal-body').html('Tidak ada konflik karena total konflik ' + data.total_conflict);
                                 }

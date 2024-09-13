@@ -251,7 +251,7 @@ class JadwalController extends BaseController
             $ruangan = $this->ruanganModel->find($this->request->getPost('ruangan_id'));
             $waktuKuliah = $this->waktuKuliahModel->find($this->request->getPost('waktu_kuliah_id'));
             $dosen = $this->dosenModel->find($this->request->getPost('dosen_id'));
-    
+            
             // Prepare data for new schedule
             $newSchedule = [
                 'kelas' => $kelas,
@@ -280,7 +280,6 @@ class JadwalController extends BaseController
                 return redirect()->to('/dashboard/jadwal/create')->withInput();
             }
         }
-
 
         // Prepare data for saving
         $data = [
@@ -653,7 +652,7 @@ class JadwalController extends BaseController
 
             // Set parameter untuk genetic algorithm
             $population_size = 10;
-            $max_generation = 1000;
+            $max_generation = 100;
     
             // Hasil dari algoritma genetika
             $result = $this->geneticAlgorithmService->execute($kelasList, $mataKuliahList, $ruanganList, $waktuKuliahList, $dosenList, $population_size, $max_generation);
