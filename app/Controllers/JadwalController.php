@@ -882,16 +882,18 @@ class JadwalController extends BaseController
             $mataKuliah = $this->mataKuliahModel->where('program_studi_id', $programStudiId)->findAll();
             $ruangan = $this->ruanganModel->where('program_studi_id', $programStudiId)->findAll(); // Filter sesuai dengan program_studi_id
             $dosen = $this->dosenModel->where('program_studi_id', $programStudiId)->findAll(); // Filter sesuai dengan program_studi_id
+            $waktuKuliah = $this->waktuKuliahModel->findAll(); // Filter sesuai dengan program_studi_id
 
             // Prepare the success response
             return $this->response->setJSON([
                 'code' => 200,
                 'message' => 'Success',
                 'data' => [
-                    'kelas' => $kelas,
+                    'kelas' => $kelas,  
                     'mata_kuliah' => $mataKuliah,
                     'ruangan' => $ruangan,
-                    'dosen' => $dosen
+                    'dosen' => $dosen,
+                    'waktu_kuliah' => $waktuKuliah
                 ],
             ]);
         } catch (\Exception $e) {
