@@ -118,6 +118,7 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
         $routes->get('generate', 'JadwalController::generateView');
         $routes->post('generate', 'JadwalController::generate');
         $routes->post('generate/store', 'JadwalController::generateStore');
+        $routes->post('generate/conflict/getConflictUpdateData', 'JadwalController::getConflictUpdateData');
 
         // Route untuk dropdown
         $routes->get('dropdown/getOptionsByProgramStudi/(:num)', 'JadwalController::getOptionsByProgramStudi/$1');

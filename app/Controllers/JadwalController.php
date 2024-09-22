@@ -835,8 +835,6 @@ class JadwalController extends BaseController
             ]);
     }
 
-
-
     // Helpers
     private function validateAtributesJadwalId($kelas_ids, $mata_kuliah_ids, $ruangan_ids, $waktu_kuliah_ids, $dosen_ids)
     {
@@ -894,6 +892,43 @@ class JadwalController extends BaseController
                     'ruangan' => $ruangan,
                     'dosen' => $dosen,
                     'waktu_kuliah' => $waktuKuliah
+                ],
+            ]);
+        } catch (\Exception $e) {
+            // Return error response 
+            return $this->response->setJSON([
+                'code' => 500,
+                'message' => [
+                    'title' => 'Error',
+                    'description' => $e->getMessage(),
+                    'type' => 'error'
+                ],
+                'data' => null
+            ])->setStatusCode(500);
+        }
+    }
+
+    public function getConflictUpdateData()
+    {
+        try {
+            // Retrieve the request data (dosen_id, waktu_kuliah_id, ruangan_id)
+            $dosenId = $this->request->getPost('dosen_id');
+            $waktuKuliahId = $this->request->getPost('waktu_kuliah_id');
+            $ruanganId = $this->request->getPost('ruangan_id');
+    
+            // Fetch the relevant data based on the received IDs
+            $dosen = $this->dosenModel->find($dosenId);
+            $waktuKuliah = $this->waktuKuliahModel->find($waktuKuliahId);
+            $ruangan = $this->ruanganModel->find($ruanganId);
+    
+            // Prepare the success response
+            return $this->response->setJSON([
+                'code' => 200,
+                'message' => 'Success',
+                'data' => [
+                    'dosen' => $dosen,
+                    'waktu_kuliah' => $waktuKuliah,
+                    'ruangan' => $ruangan,
                 ],
             ]);
         } catch (\Exception $e) {

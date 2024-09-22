@@ -194,21 +194,80 @@
             // Get the index from the data-index-update attribute on the button
             let indexToUpdate = $(this).data('index-update'); // Get the dynamic index
 
-            // Clone bestIndividual
+            // Duplikat bestIndividual
             let updatedBestIndividual = { ...bestIndividual };
 
+            console.log("bestIndividual", bestIndividual[indexToUpdate]);
+            console.log("Update Best Individual", updatedBestIndividual[indexToUpdate]);
             // Ensure we're updating the correct index
             if (updatedBestIndividual[indexToUpdate]) {
                 // Update the fields in the specified index
-                updatedBestIndividual[indexToUpdate].kelas.id = $('#kelasInputSelect').val();
-                updatedBestIndividual[indexToUpdate].mata_kuliah.id = $('#mataKuliahInputSelect').val();
-                updatedBestIndividual[indexToUpdate].ruangan.id = $('#ruanganSelect').val();
-                updatedBestIndividual[indexToUpdate].waktu_kuliah.id = $('#waktuKuliahSelect').val();
-                updatedBestIndividual[indexToUpdate].dosen.id = $('#dosenSelect').val();
+                // updatedBestIndividual[indexToUpdate].kelas.id = $('#kelasInputSelect').val();
+                // updatedBestIndividual[indexToUpdate].mata_kuliah.id = $('#mataKuliahInputSelect').val();
+                // updatedBestIndividual[indexToUpdate].ruangan.id = $('#ruanganSelect').val();
+                // updatedBestIndividual[indexToUpdate].waktu_kuliah.id = $('#waktuKuliahSelect').val();
+                // updatedBestIndividual[indexToUpdate].dosen.id = $('#dosenSelect').val();
+
+                // AJAX request to update conflict data
+                $.ajax({
+                url: '/dashboard/jadwal/generate/conflict/getConflictUpdateData',
+                    type: 'POST',
+                    data: {
+                        ruangan_id: $('#ruanganSelect').val(),
+                        waktu_kuliah_id: $('#waktuKuliahSelect').val(),
+                        dosen_id: $('#dosenSelect').val(),
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.code === 200) {
+                            console.log("petot");
+                            // Update the fields in the specified index with the returned data
+                            updatedBestIndividual[indexToUpdate].ruangan = response.data.ruangan;
+                            updatedBestIndividual[indexToUpdate].waktu_kuliah = response.data.waktu_kuliah;
+                            updatedBestIndividual[indexToUpdate].dosen = response.data.dosen;
+                        } else {
+                            Swal.fire({
+                                title: 'Failed',
+                                text: 'Terjadi masalah saat mendapatkan data, silahkan coba lagi!',
+                                icon: 'warning',
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        const response = xhr.responseJSON;
+
+                        if (xhr.status === 400) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Failed',
+                                text: response.message || 'Data yang dikirim tidak valid.',
+                            });
+                        } else if (xhr.status === 422) {
+                            let errorList = '<ul>';
+                            $.each(response.errors, function(key, value) {
+                                errorList += '<li>' + value + '</li>';
+                            });
+                            errorList += '</ul>';
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Kesalahan Validasi',
+                                html: errorList,
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Terjadi kesalahan, silahkan coba lagi.',
+                                icon: 'error',
+                            });
+                        }
+                    }
+                });
             } else {
                 console.error(`Index ${indexToUpdate} does not exist in bestIndividual`);
             }
-
+            console.log("after edit", updatedBestIndividual[indexToUpdate]);
+            
             // Prepare the payload to send
             let inputData = JSON.stringify(updatedBestIndividual);
 
@@ -281,6 +340,9 @@
             const editIndex = $(this).data('index');
             const individual = bestIndividual[editIndex];
             const programStudiId = $('#prodi').val();
+
+            // Set the index value in the data-index-update attribute of the save button
+            $('#saveConflictChanges').data('index-update', editIndex);
 
             // // Construct the modal content with individual data
             // let modalContent = `
