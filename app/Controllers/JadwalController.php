@@ -36,6 +36,7 @@ class JadwalController extends BaseController
         $ruangan_with_time_map = [];
         $dosen_with_time_map = [];
         $conflict_details = [];
+        $conflict_index = [];
 
         // Tambahkan atribut 'jam' ke setiap entri di $individual
         foreach ($individual as $index => &$schedule) {
@@ -80,6 +81,9 @@ class JadwalController extends BaseController
                 $conflict_details[] = "Baris " . $index + 1 . " \t: " . $formatted_data($individual[$index]);
                 $conflict_details[] = "Baris " . ($ruangan_with_time_map[$ruangan_time_key] + 1) . " \t: " . $formatted_data($individual[$ruangan_with_time_map[$ruangan_time_key]]);
                 $conflict_details[] = ""; // Add empty line as a separator
+
+                // Store the conflicting indices (original indices without +1)
+                $conflict_index[] = [$index, $ruangan_with_time_map[$ruangan_time_key]];
             } else {
                 // No conflict, store this room-time pairing
                 $ruangan_with_time_map[$ruangan_time_key] = $index;
@@ -93,6 +97,9 @@ class JadwalController extends BaseController
                 $conflict_details[] = "Baris " . $index + 1 . " \t: " . $formatted_data($individual[$index]);
                 $conflict_details[] = "Baris " . ($dosen_with_time_map[$dosen_time_key] + 1) . " \t: " . $formatted_data($individual[$dosen_with_time_map[$dosen_time_key]]);
                 $conflict_details[] = ""; // Add empty line as a separator
+
+                // Store the conflicting indices (original indices without +1)
+                $conflict_index[] = [$index, $dosen_with_time_map[$dosen_time_key]];
             } else {
                 // No conflict, store this instructor-time pairing
                 $dosen_with_time_map[$dosen_time_key] = $index;
@@ -101,10 +108,11 @@ class JadwalController extends BaseController
     
         // Return conflict details
         $console = "<pre>" . implode("\n", $conflict_details) . "</pre>";
-    
+        
         return [
             'conflict' => $conflicts,
-            'debug_conflict' => $console
+            'debug_conflict' => $console,
+            'conflict_index' => $conflict_index
         ];
     }
     
@@ -656,6 +664,9 @@ class JadwalController extends BaseController
     
             // Hasil dari algoritma genetika
             $result = $this->geneticAlgorithmService->execute($kelasList, $mataKuliahList, $ruanganList, $waktuKuliahList, $dosenList, $population_size, $max_generation);
+            
+            // Simpan $result ke dalam session
+            session()->set('generate_result_temp', $result);
 
             // Return response success dari result data
             return $this->response->setJSON([
@@ -680,6 +691,7 @@ class JadwalController extends BaseController
             ])->setStatusCode(500);
         }
     }
+
     public function generateStore()
     {
         // Validasi input
@@ -833,6 +845,107 @@ class JadwalController extends BaseController
                 ], 
                 'data' => $dataBatch
             ]);
+    }
+
+    public function checkConflictIndividual()
+    {
+        // Validasi input
+        $validation = \Config\Services::validation();
+        $validation->setRules([
+            'input_data' => [
+                'rules' => 'required|string',
+                'errors' => [
+                    'required' => 'Input data harus diisi.',
+                    'string' => 'Input data harus berupa string.'
+                ]
+            ],
+            'index_updated' => [
+                'rules' => 'required|integer',
+                'errors' => [
+                    'required' => 'Indeks baris harus diisi.',
+                    'integer' => 'Indeks baris harus berupa integer.'
+                ]
+            ]
+        ]);
+
+        // Gunakan validasi ke dalam request
+        if (!$validation->withRequest($this->request)->run()) {
+            $errors = $validation->getErrors();
+
+            // Format validation error dalam response JSON
+            return $this->response->setJSON([
+                'code' => 422,
+                'message' => 'Kesalahan Validasi',
+                'data' => null,
+                'errors' => $errors
+            ])->setStatusCode(422);
+        }
+
+        // Ambil input_data dari request POST dan decode menjadi array
+        $inputData = $this->request->getPost('input_data');
+        $indexUpdate = $this->request->getPost('index_updated');
+        $decodedInputData = json_decode($inputData, true);
+
+        // Pastikan input_data bisa di-decode sebagai JSON
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->response->setJSON([
+                'code' => 400,
+                'message' => 'Input data tidak valid, pastikan format JSON benar.',
+                'data' => null
+            ])->setStatusCode(400);
+        }
+
+        // Panggil fungsi calculate_conflict untuk cek konflik
+        $conflictResult = $this->calculate_conflict($decodedInputData);
+
+        // Jika ada konflik, return status 400 dengan detail konflik
+        if ($conflictResult['conflict'] > 0) {
+            // Ambil conflict_index dan indexUpdate dari $conflictResult
+            $conflictIndexes = $conflictResult['conflict_index'];
+
+            // Buat array untuk menampung baris konflik yang unik
+            $conflictLines = [];
+
+            // Loop setiap konflik untuk ambil indeks yang tidak ada di indexUpdate
+            foreach ($conflictIndexes as $indexes) {
+                foreach ($indexes as $index) {
+                    // Hanya tambahkan index yang tidak ada di indexUpdate
+                    if (!in_array($index, [$indexUpdate]) && !in_array($index, $conflictLines)) {
+                        $conflictLines[] = $index + 1;
+                    }
+                }
+            }
+
+            // Sortir conflictLines untuk urutan yang rapi
+            sort($conflictLines);
+
+            // Gabungkan menjadi string format "xx, xx, xx"
+            $conflictLinesString = implode(', ', $conflictLines);
+
+            // Return response JSON dengan informasi konflik
+            return $this->response->setJSON([
+                'code' => 400,
+                'message' => 'Masih terdapat ' . $conflictResult['conflict'] . ' konflik jadwal dengan data ini, yaitu pada baris ' . $conflictLinesString . ". Anda bisa mencari kombinasi baru atau untuk mempermudah sebaiknya anda melakukan generate jadwal ulang sampai tidak ada konflik",
+                'data' => [
+                    'conflict' => $conflictResult,
+                    'index_update' => $indexUpdate
+                ]
+            ])->setStatusCode(400);
+        }
+
+        // Ambil hasil 'old_generate_result' dari session
+        $oldGenerateResult = session()->get('generate_result_temp');
+
+        // Jika tidak ada konflik, return sukses tanpa konflik
+        return $this->response->setJSON([
+            'code' => 200,
+            'message' => 'Jadwal pada baris ' . $indexUpdate . ' berhasil di update dan tidak ada konflik.',
+            'data' => [
+                'conflict' => $conflictResult,
+                'index_update' => $indexUpdate,
+                'old_generate_result' => $oldGenerateResult,
+            ]
+        ])->setStatusCode(200);
     }
 
     // Helpers

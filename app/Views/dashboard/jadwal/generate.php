@@ -169,6 +169,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
 <script>
     // Declare global variables
     let bestIndividual = null;
@@ -195,7 +196,8 @@
             let indexToUpdate = $(this).data('index-update'); // Get the dynamic index
 
             // Duplikat bestIndividual
-            let updatedBestIndividual = { ...bestIndividual };
+            // let updatedBestIndividual = JSON.parse(JSON.stringify(bestIndividual));
+            let updatedBestIndividual = _.cloneDeep(bestIndividual);
 
             console.log("bestIndividual", bestIndividual[indexToUpdate]);
             console.log("Update Best Individual", updatedBestIndividual[indexToUpdate]);
@@ -220,11 +222,165 @@
                     dataType: 'json',
                     success: function(response) {
                         if (response.code === 200) {
-                            console.log("petot");
                             // Update the fields in the specified index with the returned data
                             updatedBestIndividual[indexToUpdate].ruangan = response.data.ruangan;
                             updatedBestIndividual[indexToUpdate].waktu_kuliah = response.data.waktu_kuliah;
                             updatedBestIndividual[indexToUpdate].dosen = response.data.dosen;
+                            console.log("after edit", JSON.stringify(updatedBestIndividual[indexToUpdate]));
+
+                            // Prepare the payload to send
+                            let inputData = JSON.stringify(updatedBestIndividual);
+
+                            // Send AJAX request to check for conflict
+                            $.ajax({
+                                url: '/dashboard/jadwal/generate/conflict/checkConflictIndividual',
+                                type: 'POST',
+                                data: {
+                                    input_data: inputData,
+                                    index_updated: indexToUpdate
+                                },
+                                success: function (response) {
+                                    if (response.code === 200) {
+                                        // Sweet Alert for success
+                                        Swal.fire({
+                                            title: 'Berhasil',
+                                            text: 'Sukses memperbaiki konflik!',
+                                            icon: 'success',
+                                            confirmButtonText: 'OK'
+                                        }).then(() => {
+                                            const conflict = response.data.conflict;
+                                            const oldGenerateResult = response.data.old_generate_result;
+                                            
+                                            // Prepare explanation and table content from old_generate_result
+                                            // bestIndividual = oldGenerateResult.best_individual;
+                                            bestIndividual = _.cloneDeep(updatedBestIndividual);
+                                            totalConflict = response.data.conflict.conflict; // Use conflict data for totalConflict
+                                            
+                                            // Construct the explanation
+                                            let explanation = `
+                                                <p class='m-0'><strong>========== HASIL ALGORITMA GENETIKA ==========</strong></p>
+                                                <p class='m-0'><strong>FITNESS TERBAIK       :</strong> ${oldGenerateResult.best_fitness}</p>
+                                                <p class='m-0'><strong>GENERASI                  :</strong> ${oldGenerateResult.best_generation}</p>
+                                                <p class='m-0'><strong>EXECUTION TIME        :</strong> ${oldGenerateResult.execution_time} detik</p>
+                                                <p class='m-0'><strong>MEMORY USAGE          :</strong> ${oldGenerateResult.memory_usage}</p>
+                                                <p class='m-0'><strong>JUMLAH KONFLIK        :</strong> ${totalConflict}</p>
+                                                <p class='m-0'>Catatan :</p>
+                                                <p class='m-0 ${totalConflict > 0 ? 'text-danger' : ''}'>
+                                                    ${totalConflict > 0 
+                                                        ? `Terdapat konflik total ${totalConflict}, Anda dapat memperbaiki pada tombol <strong>"Evaluasi Jadwal"</strong> atau melakukan generate ulang dengan klik tombol <strong>"Generate Jadwal"</strong> sampai tidak ada konflik pada saat melakukan generate jadwal`
+                                                        : ''
+                                                    }
+                                                </p>
+                                                <p class='m-0'>Individu terbaik berhasil ditemukan pada generasi ke-${oldGenerateResult.best_generation} dan individu ke-${oldGenerateResult.best_individual_index}!</p>
+                                                <p class='m-0'>Melakukan looping generasi ke ${oldGenerateResult.generation_reached} dari max generasi yaitu ${oldGenerateResult.max_generation}</p>
+                                            `;
+
+                                            // Construct the table
+                                            let tableHTML = '<table class="table table-bordered">';
+                                            tableHTML += '<thead><tr><th>No</th><th>Kelas - Kode</th><th>Mata Kuliah - Kode</th><th>Ruangan - Kode</th><th>Waktu Kuliah</th><th>Dosen</th></tr></thead><tbody>';
+                                            $.each(bestIndividual, function(index, individual) {
+                                                const no = index + 1;
+                                                tableHTML += `
+                                                    <tr>
+                                                        <td>${no}</td>
+                                                        <td>${individual.kelas.nama} - ${individual.kelas.kode}</td>
+                                                        <td>${individual.mata_kuliah.nama} - ${individual.mata_kuliah.kode}</td>
+                                                        <td>${individual.ruangan.nama} - ${individual.ruangan.kode}</td>
+                                                        <td>${individual.waktu_kuliah.hari} (${formatWaktu(individual.waktu_kuliah.jam_mulai)} - ${formatWaktu(individual.waktu_kuliah.jam_selesai)})</td>
+                                                        <td>${individual.dosen.nama} - ${individual.dosen.nomer_pegawai}</td>
+                                                    </tr>
+                                                `;
+                                            });
+                                            tableHTML += '</tbody></table>';
+
+                                            // Display the explanation, save button, and table
+                                            $('#containerResult').html(`
+                                                ${explanation}
+                                                <button type="button" id="saveJadwalBtn" class="btn btn-primary my-3" ${totalConflict > 0 ? 'text-danger' : ''}'
+                                                    ${totalConflict > 0  ? 'disabled' : ''}>Simpan Data Jadwal</button>
+                                                ${tableHTML}
+                                            `);
+
+                                            $('#evaluasiBtn').prop('disabled', false);
+                                            $('#perhitunganBtn').prop('disabled', false);
+
+                                            // Check if debug_conflict exists, then display it in the modal
+                                            const debugConflict = response.data.conflict.debug_conflict;
+                                            if (debugConflict) {
+                                                let conflictButtonsHTML = '';
+                                                // Loop through conflict and generate buttons
+                                                if (conflict && conflict.length > 0) {
+                                                    $.each(conflict, function(loopIndex, conflictPair) {
+                                                        const index1 = conflictPair[0] + 1; // Adjust index to human-readable (1-based)
+                                                        const index2 = conflictPair[1] + 1;
+
+                                                        conflictButtonsHTML += `
+                                                            <br/>
+                                                            <h5 class="fs-5 fw-medium mb-0">Konflik ke-${loopIndex + 1}</h5>
+                                                            <button type="button" class="btn btn-info conflict-btn me-3" data-index="${conflictPair[0]}" data-bs-toggle="modal" data-bs-target="#bestIndividualModal">
+                                                                Data baris ke-${index1}
+                                                            </button>
+                                                            <button type="button" class="btn btn-info conflict-btn" data-index="${conflictPair[1]}" data-bs-toggle="modal" data-bs-target="#bestIndividualModal">
+                                                                Data baris ke-${index2}
+                                                            </button>
+                                                            <br/>
+                                                        `;
+                                                    });
+                                                }
+                                                $('#evaluasiModal .modal-body').html(debugConflict + conflictButtonsHTML);
+                                            } else {
+                                                $('#evaluasiModal .modal-body').html('Tidak ada konflik karena total konflik ' + totalConflict);
+                                            }
+
+                                            // Check if debug_result exists, then display it in the modal
+                                            const debugResult = oldGenerateResult.debug_result;
+                                            if (debugResult) {
+                                                $('#perhitunganModal .modal-body').html(debugResult);
+                                            }
+
+                                            // Close modals after success
+                                            $('#bestIndividualModal').modal('hide');
+                                            $('#evaluasiModal').modal('hide');
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Failed',
+                                            text: 'Terjadi masalah saat memperbaiki konflik!',
+                                            icon: 'warning',
+                                        });
+                                    }
+                                },
+                                error: function (xhr) {
+                                    // Handle error
+                                    const response = xhr.responseJSON;
+                                            
+                                    if (xhr.status === 400) {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Failed',
+                                            text: response.message || 'Data yang dikirim tidak valid atau ada yang kosong.',
+                                        });
+                                    } else if (xhr.status === 422) {
+                                        let errorList = '<ul>';
+                                        $.each(response.errors, function(key, value) {
+                                            errorList += '<li>' + value + '</li>';
+                                        });
+                                        errorList += '</ul>';
+
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Kesalahan Validasi',
+                                            html: errorList,
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Error',
+                                            text: 'Terjadi kesalahan, silahkan coba lagi.',
+                                            icon: 'error',
+                                        });
+                                    }
+                                }
+                            });
                         } else {
                             Swal.fire({
                                 title: 'Failed',
@@ -264,74 +420,12 @@
                     }
                 });
             } else {
-                console.error(`Index ${indexToUpdate} does not exist in bestIndividual`);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Tidak ada data pada baris ke-' + (indexToUpdate + 1) + ' pada hasil generate jadwal',
+                    icon: 'error',
+                });
             }
-            console.log("after edit", updatedBestIndividual[indexToUpdate]);
-            
-            // Prepare the payload to send
-            let inputData = JSON.stringify(updatedBestIndividual);
-
-            // Send AJAX request to check for conflict
-            $.ajax({
-                url: '/dashboard/jadwal/generate/check-conflict',
-                type: 'POST',
-                data: {
-                    input_data: inputData
-                },
-                success: function (response) {
-                    if (response.code === 200) {
-                        // Sweet Alert for success
-                        Swal.fire({
-                            title: 'Berhasil',
-                            text: 'Sukses memperbaiki konflik!',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            // Update data bestIndividual with the updated one
-                            bestIndividual = { ...updatedBestIndividual };
-
-                            // Update table with new bestIndividual data
-                            updateTable(bestIndividual);
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Failed',
-                            text: 'Terjadi masalah saat memperbaiki konflik!',
-                            icon: 'warning',
-                        });
-                    }
-                },
-                error: function (xhr) {
-                    // Handle error
-                    const response = xhr.responseJSON;
-                            
-                    if (xhr.status === 400) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Failed',
-                            text: response.message || 'Data yang dikirim tidak valid atau ada yang kosong.',
-                        });
-                    } else if (xhr.status === 422) {
-                        let errorList = '<ul>';
-                        $.each(response.errors, function(key, value) {
-                            errorList += '<li>' + value + '</li>';
-                        });
-                        errorList += '</ul>';
-
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Kesalahan Validasi',
-                            html: errorList,
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'Terjadi kesalahan, silahkan coba lagi.',
-                            icon: 'error',
-                        });
-                    }
-                }
-            });
         });
 
         // Event handler for conflict buttons

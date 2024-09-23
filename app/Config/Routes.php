@@ -20,8 +20,6 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
     // Route utama dashboard
     $routes->get('/', 'DashboardController::index');
     
-    $routes->get('test', 'JadwalGenerateController::index');
-
     // Route untuk 'mata-kuliah'
     $routes->group('mata-kuliah', function($routes) {
         $routes->get('/', 'MataKuliahController::index');
@@ -119,6 +117,7 @@ $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
         $routes->post('generate', 'JadwalController::generate');
         $routes->post('generate/store', 'JadwalController::generateStore');
         $routes->post('generate/conflict/getConflictUpdateData', 'JadwalController::getConflictUpdateData');
+        $routes->post('generate/conflict/checkConflictIndividual', 'JadwalController::checkConflictIndividual');
 
         // Route untuk dropdown
         $routes->get('dropdown/getOptionsByProgramStudi/(:num)', 'JadwalController::getOptionsByProgramStudi/$1');
