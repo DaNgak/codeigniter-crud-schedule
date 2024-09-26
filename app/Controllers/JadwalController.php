@@ -660,7 +660,7 @@ class JadwalController extends BaseController
 
             // Set parameter untuk genetic algorithm
             $population_size = 10;
-            $max_generation = 100;
+            $max_generation = 1000;
     
             // Hasil dari algoritma genetika
             $result = $this->geneticAlgorithmService->execute($kelasList, $mataKuliahList, $ruanganList, $waktuKuliahList, $dosenList, $population_size, $max_generation);
